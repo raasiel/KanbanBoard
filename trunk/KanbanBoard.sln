@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KanbanBoard", "KanbanBoard\KanbanBoard.csproj", "{0C8857F6-8333-4A03-A5D0-BCBE96D18510}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KanbanBoard.Data", "KanbanBoard.Data\KanbanBoard.Data.csproj", "{B45B9418-149D-4FF7-B332-12F51B3BC8B1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0C8857F6-8333-4A03-A5D0-BCBE96D18510}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0C8857F6-8333-4A03-A5D0-BCBE96D18510}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0C8857F6-8333-4A03-A5D0-BCBE96D18510}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0C8857F6-8333-4A03-A5D0-BCBE96D18510}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B45B9418-149D-4FF7-B332-12F51B3BC8B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B45B9418-149D-4FF7-B332-12F51B3BC8B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B45B9418-149D-4FF7-B332-12F51B3BC8B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B45B9418-149D-4FF7-B332-12F51B3BC8B1}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
