@@ -1,0 +1,489 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="2.0" xmlns:edmx="http://schemas.microsoft.com/ado/2008/10/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="KanbanMdl.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2008" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/02/edm/ssdl">
+        <EntityContainer Name="KanbanMdlStoreContainer">
+          <EntitySet Name="Project" EntityType="KanbanMdl.Store.Project" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="ProjectStatus" EntityType="KanbanMdl.Store.ProjectStatus" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="Task" EntityType="KanbanMdl.Store.Task" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="TaskAssignment" EntityType="KanbanMdl.Store.TaskAssignment" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="TFSWorkItem" EntityType="KanbanMdl.Store.TFSWorkItem" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="User" EntityType="KanbanMdl.Store.User" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="UserProjectMap" EntityType="KanbanMdl.Store.UserProjectMap" store:Type="Tables" Schema="dbo" />
+          <AssociationSet Name="FK__ProjectSt__Proje__0BC6C43E" Association="KanbanMdl.Store.FK__ProjectSt__Proje__0BC6C43E">
+            <End Role="Project" EntitySet="Project" />
+            <End Role="ProjectStatus" EntitySet="ProjectStatus" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Task__ProjectID__267ABA7A" Association="KanbanMdl.Store.FK__Task__ProjectID__267ABA7A">
+            <End Role="Project" EntitySet="Project" />
+            <End Role="Task" EntitySet="Task" />
+          </AssociationSet>
+          <AssociationSet Name="FK__TaskAssig__Statu__239E4DCF" Association="KanbanMdl.Store.FK__TaskAssig__Statu__239E4DCF">
+            <End Role="ProjectStatus" EntitySet="ProjectStatus" />
+            <End Role="TaskAssignment" EntitySet="TaskAssignment" />
+          </AssociationSet>
+          <AssociationSet Name="FK__TaskAssig__TaskI__24927208" Association="KanbanMdl.Store.FK__TaskAssig__TaskI__24927208">
+            <End Role="Task" EntitySet="Task" />
+            <End Role="TaskAssignment" EntitySet="TaskAssignment" />
+          </AssociationSet>
+          <AssociationSet Name="FK__TaskAssig__UserI__25869641" Association="KanbanMdl.Store.FK__TaskAssig__UserI__25869641">
+            <End Role="User" EntitySet="User" />
+            <End Role="TaskAssignment" EntitySet="TaskAssignment" />
+          </AssociationSet>
+          <AssociationSet Name="FK__UserProje__Proje__060DEAE8" Association="KanbanMdl.Store.FK__UserProje__Proje__060DEAE8">
+            <End Role="Project" EntitySet="Project" />
+            <End Role="UserProjectMap" EntitySet="UserProjectMap" />
+          </AssociationSet>
+          <AssociationSet Name="FK__UserProje__UserI__07020F21" Association="KanbanMdl.Store.FK__UserProje__UserI__07020F21">
+            <End Role="User" EntitySet="User" />
+            <End Role="UserProjectMap" EntitySet="UserProjectMap" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="Project">
+          <Key>
+            <PropertyRef Name="ProjectID" />
+          </Key>
+          <Property Name="ProjectID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="varchar" Nullable="false" MaxLength="256" />
+          <Property Name="AdminID" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="ProjectStatus">
+          <Key>
+            <PropertyRef Name="ProjectStatusID" />
+          </Key>
+          <Property Name="ProjectStatusID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="ProjectID" Type="int" Nullable="false" />
+          <Property Name="Name" Type="varchar" MaxLength="256" />
+        </EntityType>
+        <EntityType Name="Task">
+          <Key>
+            <PropertyRef Name="TaskID" />
+          </Key>
+          <Property Name="TaskID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="TFSTaskID" Type="int" />
+          <Property Name="Title" Type="varchar" Nullable="false" MaxLength="256" />
+          <Property Name="Descriptions" Type="varchar(max)" Nullable="false" />
+          <Property Name="Comments" Type="varchar(max)" />
+          <Property Name="ProjectID" Type="int" />
+        </EntityType>
+        <EntityType Name="TaskAssignment">
+          <Key>
+            <PropertyRef Name="TaskAssignmentID" />
+          </Key>
+          <Property Name="TaskAssignmentID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="TaskID" Type="int" />
+          <Property Name="UserID" Type="int" Nullable="false" />
+          <Property Name="StatusID" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="TFSWorkItem">
+          <Key>
+            <PropertyRef Name="WorkItemID" />
+          </Key>
+          <Property Name="WorkItemID" Type="int" Nullable="false" />
+          <Property Name="Title" Type="varchar" Nullable="false" MaxLength="256" />
+          <Property Name="Descriptions" Type="varchar" MaxLength="256" />
+          <Property Name="AssignedTo" Type="varchar" MaxLength="256" />
+          <Property Name="Attachement" Type="varchar" MaxLength="256" />
+          <Property Name="Converted" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="User">
+          <Key>
+            <PropertyRef Name="UserID" />
+          </Key>
+          <Property Name="UserID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="Email" Type="varchar" Nullable="false" MaxLength="256" />
+          <Property Name="Password" Type="varchar" Nullable="false" MaxLength="256" />
+          <Property Name="Name" Type="nvarchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="UserProjectMap">
+          <Key>
+            <PropertyRef Name="ProjectID" />
+            <PropertyRef Name="UserID" />
+          </Key>
+          <Property Name="ProjectID" Type="int" Nullable="false" />
+          <Property Name="UserID" Type="int" Nullable="false" />
+        </EntityType>
+        <Association Name="FK__ProjectSt__Proje__0BC6C43E">
+          <End Role="Project" Type="KanbanMdl.Store.Project" Multiplicity="1" />
+          <End Role="ProjectStatus" Type="KanbanMdl.Store.ProjectStatus" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Project">
+              <PropertyRef Name="ProjectID" />
+            </Principal>
+            <Dependent Role="ProjectStatus">
+              <PropertyRef Name="ProjectID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Task__ProjectID__267ABA7A">
+          <End Role="Project" Type="KanbanMdl.Store.Project" Multiplicity="0..1" />
+          <End Role="Task" Type="KanbanMdl.Store.Task" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Project">
+              <PropertyRef Name="ProjectID" />
+            </Principal>
+            <Dependent Role="Task">
+              <PropertyRef Name="ProjectID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__TaskAssig__Statu__239E4DCF">
+          <End Role="ProjectStatus" Type="KanbanMdl.Store.ProjectStatus" Multiplicity="1" />
+          <End Role="TaskAssignment" Type="KanbanMdl.Store.TaskAssignment" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ProjectStatus">
+              <PropertyRef Name="ProjectStatusID" />
+            </Principal>
+            <Dependent Role="TaskAssignment">
+              <PropertyRef Name="StatusID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__TaskAssig__TaskI__24927208">
+          <End Role="Task" Type="KanbanMdl.Store.Task" Multiplicity="0..1" />
+          <End Role="TaskAssignment" Type="KanbanMdl.Store.TaskAssignment" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Task">
+              <PropertyRef Name="TaskID" />
+            </Principal>
+            <Dependent Role="TaskAssignment">
+              <PropertyRef Name="TaskID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__TaskAssig__UserI__25869641">
+          <End Role="User" Type="KanbanMdl.Store.User" Multiplicity="1" />
+          <End Role="TaskAssignment" Type="KanbanMdl.Store.TaskAssignment" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="UserID" />
+            </Principal>
+            <Dependent Role="TaskAssignment">
+              <PropertyRef Name="UserID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__UserProje__Proje__060DEAE8">
+          <End Role="Project" Type="KanbanMdl.Store.Project" Multiplicity="1" />
+          <End Role="UserProjectMap" Type="KanbanMdl.Store.UserProjectMap" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Project">
+              <PropertyRef Name="ProjectID" />
+            </Principal>
+            <Dependent Role="UserProjectMap">
+              <PropertyRef Name="ProjectID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__UserProje__UserI__07020F21">
+          <End Role="User" Type="KanbanMdl.Store.User" Multiplicity="1" />
+          <End Role="UserProjectMap" Type="KanbanMdl.Store.UserProjectMap" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="UserID" />
+            </Principal>
+            <Dependent Role="UserProjectMap">
+              <PropertyRef Name="UserID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Function Name="GetProjectBoard" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="ProjectID" Type="int" Mode="In" />
+        </Function>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="KanbanMdl" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+        <EntityContainer Name="KanbanTFSEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Projects" EntityType="KanbanMdl.Project" />
+          <EntitySet Name="ProjectStatus1" EntityType="KanbanMdl.ProjectStatus" />
+          <EntitySet Name="Tasks" EntityType="KanbanMdl.Task" />
+          <EntitySet Name="TaskAssignments" EntityType="KanbanMdl.TaskAssignment" />
+          <EntitySet Name="TFSWorkItems" EntityType="KanbanMdl.TFSWorkItem" />
+          <EntitySet Name="Users" EntityType="KanbanMdl.User" />
+          <AssociationSet Name="FK__ProjectSt__Proje__0BC6C43E" Association="KanbanMdl.FK__ProjectSt__Proje__0BC6C43E">
+            <End Role="Project" EntitySet="Projects" />
+            <End Role="ProjectStatus" EntitySet="ProjectStatus1" />
+          </AssociationSet>
+          <AssociationSet Name="FK__TaskAssig__Statu__1A14E395" Association="KanbanMdl.FK__TaskAssig__Statu__1A14E395">
+            <End Role="ProjectStatus" EntitySet="ProjectStatus1" />
+            <End Role="TaskAssignment" EntitySet="TaskAssignments" />
+          </AssociationSet>
+          <AssociationSet Name="FK__TaskAssig__TaskI__182C9B23" Association="KanbanMdl.FK__TaskAssig__TaskI__182C9B23">
+            <End Role="Task" EntitySet="Tasks" />
+            <End Role="TaskAssignment" EntitySet="TaskAssignments" />
+          </AssociationSet>
+          <AssociationSet Name="FK__TaskAssig__UserI__1920BF5C" Association="KanbanMdl.FK__TaskAssig__UserI__1920BF5C">
+            <End Role="User" EntitySet="Users" />
+            <End Role="TaskAssignment" EntitySet="TaskAssignments" />
+          </AssociationSet>
+          <AssociationSet Name="UserProjectMap" Association="KanbanMdl.UserProjectMap">
+            <End Role="Project" EntitySet="Projects" />
+            <End Role="User" EntitySet="Users" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Task__ProjectID__267ABA7A" Association="KanbanMdl.FK__Task__ProjectID__267ABA7A">
+            <End Role="Project" EntitySet="Projects" />
+            <End Role="Task" EntitySet="Tasks" />
+          </AssociationSet>
+          <FunctionImport Name="GetProjectBoard" ReturnType="Collection(KanbanMdl.GetProjectBoard_Result)">
+          <Parameter Name="ProjectID" Mode="In" Type="Int32" />
+          </FunctionImport>
+        </EntityContainer>
+        <EntityType Name="Project">
+          <Key>
+            <PropertyRef Name="ProjectID" />
+          </Key>
+          <Property Name="ProjectID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="256" Unicode="false" FixedLength="false" />
+          <Property Name="AdminID" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="ProjectStatus" Relationship="KanbanMdl.FK__ProjectSt__Proje__0BC6C43E" FromRole="Project" ToRole="ProjectStatus" />
+          <NavigationProperty Name="Users" Relationship="KanbanMdl.UserProjectMap" FromRole="Project" ToRole="User" />
+          <NavigationProperty Name="Tasks" Relationship="KanbanMdl.FK__Task__ProjectID__267ABA7A" FromRole="Project" ToRole="Task" />
+        </EntityType>
+        <EntityType Name="ProjectStatus">
+          <Key>
+            <PropertyRef Name="ProjectStatusID" />
+          </Key>
+          <Property Name="ProjectStatusID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ProjectID" Type="Int32" Nullable="false" />
+          <Property Name="Name" Type="String" MaxLength="256" Unicode="false" FixedLength="false" />
+          <NavigationProperty Name="Project" Relationship="KanbanMdl.FK__ProjectSt__Proje__0BC6C43E" FromRole="ProjectStatus" ToRole="Project" />
+          <NavigationProperty Name="TaskAssignments" Relationship="KanbanMdl.FK__TaskAssig__Statu__1A14E395" FromRole="ProjectStatus" ToRole="TaskAssignment" />
+        </EntityType>
+        <EntityType Name="Task">
+          <Key>
+            <PropertyRef Name="TaskID" />
+          </Key>
+          <Property Name="TaskID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TFSTaskID" Type="Int32" />
+          <Property Name="Title" Type="String" Nullable="false" MaxLength="256" Unicode="false" FixedLength="false" />
+          <Property Name="Descriptions" Type="String" Nullable="false" MaxLength="Max" Unicode="false" FixedLength="false" />
+          <Property Name="Comments" Type="String" MaxLength="Max" Unicode="false" FixedLength="false" />
+          <NavigationProperty Name="TaskAssignments" Relationship="KanbanMdl.FK__TaskAssig__TaskI__182C9B23" FromRole="Task" ToRole="TaskAssignment" />
+          <Property Type="Int32" Name="ProjectID" />
+          <NavigationProperty Name="Project" Relationship="KanbanMdl.FK__Task__ProjectID__267ABA7A" FromRole="Task" ToRole="Project" />
+        </EntityType>
+        <EntityType Name="TaskAssignment">
+          <Key>
+            <PropertyRef Name="TaskAssignmentID" />
+          </Key>
+          <Property Name="TaskAssignmentID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TaskID" Type="Int32" />
+          <Property Name="UserID" Type="Int32" Nullable="false" />
+          <Property Name="StatusID" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="ProjectStatus" Relationship="KanbanMdl.FK__TaskAssig__Statu__1A14E395" FromRole="TaskAssignment" ToRole="ProjectStatus" />
+          <NavigationProperty Name="Task" Relationship="KanbanMdl.FK__TaskAssig__TaskI__182C9B23" FromRole="TaskAssignment" ToRole="Task" />
+          <NavigationProperty Name="User" Relationship="KanbanMdl.FK__TaskAssig__UserI__1920BF5C" FromRole="TaskAssignment" ToRole="User" />
+        </EntityType>
+        <EntityType Name="TFSWorkItem">
+          <Key>
+            <PropertyRef Name="WorkItemID" />
+          </Key>
+          <Property Name="WorkItemID" Type="Int32" Nullable="false" />
+          <Property Name="Title" Type="String" Nullable="false" MaxLength="256" Unicode="false" FixedLength="false" />
+          <Property Name="Descriptions" Type="String" MaxLength="256" Unicode="false" FixedLength="false" />
+          <Property Name="AssignedTo" Type="String" MaxLength="256" Unicode="false" FixedLength="false" />
+          <Property Name="Attachement" Type="String" MaxLength="256" Unicode="false" FixedLength="false" />
+          <Property Name="Converted" Type="Boolean" Nullable="false" />
+        </EntityType>
+        <EntityType Name="User">
+          <Key>
+            <PropertyRef Name="UserID" />
+          </Key>
+          <Property Name="UserID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Email" Type="String" Nullable="false" MaxLength="256" Unicode="false" FixedLength="false" />
+          <Property Name="Password" Type="String" Nullable="false" MaxLength="256" Unicode="false" FixedLength="false" />
+          <NavigationProperty Name="TaskAssignments" Relationship="KanbanMdl.FK__TaskAssig__UserI__1920BF5C" FromRole="User" ToRole="TaskAssignment" />
+          <NavigationProperty Name="Projects" Relationship="KanbanMdl.UserProjectMap" FromRole="User" ToRole="Project" />
+          <Property Type="String" Name="Name" MaxLength="50" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <Association Name="FK__ProjectSt__Proje__0BC6C43E">
+          <End Role="Project" Type="KanbanMdl.Project" Multiplicity="1" />
+          <End Role="ProjectStatus" Type="KanbanMdl.ProjectStatus" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Project">
+              <PropertyRef Name="ProjectID" />
+            </Principal>
+            <Dependent Role="ProjectStatus">
+              <PropertyRef Name="ProjectID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__TaskAssig__Statu__1A14E395">
+          <End Role="ProjectStatus" Type="KanbanMdl.ProjectStatus" Multiplicity="1" />
+          <End Role="TaskAssignment" Type="KanbanMdl.TaskAssignment" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ProjectStatus">
+              <PropertyRef Name="ProjectStatusID" />
+            </Principal>
+            <Dependent Role="TaskAssignment">
+              <PropertyRef Name="StatusID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__TaskAssig__TaskI__182C9B23">
+          <End Role="Task" Type="KanbanMdl.Task" Multiplicity="0..1" />
+          <End Role="TaskAssignment" Type="KanbanMdl.TaskAssignment" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Task">
+              <PropertyRef Name="TaskID" />
+            </Principal>
+            <Dependent Role="TaskAssignment">
+              <PropertyRef Name="TaskID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__TaskAssig__UserI__1920BF5C">
+          <End Role="User" Type="KanbanMdl.User" Multiplicity="1" />
+          <End Role="TaskAssignment" Type="KanbanMdl.TaskAssignment" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="UserID" />
+            </Principal>
+            <Dependent Role="TaskAssignment">
+              <PropertyRef Name="UserID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="UserProjectMap">
+          <End Role="Project" Type="KanbanMdl.Project" Multiplicity="*" />
+          <End Role="User" Type="KanbanMdl.User" Multiplicity="*" />
+        </Association>
+        <Association Name="FK__Task__ProjectID__267ABA7A">
+          <End Type="KanbanMdl.Project" Role="Project" Multiplicity="0..1" />
+          <End Type="KanbanMdl.Task" Role="Task" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Project">
+              <PropertyRef Name="ProjectID" />
+            </Principal>
+            <Dependent Role="Task">
+              <PropertyRef Name="ProjectID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <ComplexType Name="GetProjectBoard_Result">
+          <Property Type="Int32" Name="TaskID" Nullable="false" />
+          <Property Type="String" Name="Title" Nullable="false" MaxLength="256" />
+          <Property Type="String" Name="Descriptions" Nullable="false" />
+          <Property Type="String" Name="Comments" Nullable="true" />
+          <Property Type="String" Name="Status" Nullable="true" MaxLength="256" />
+          <Property Type="Int32" Name="UserID" Nullable="false" />
+          <Property Type="Int32" Name="StatusID" Nullable="false" />
+          <Property Type="Int32" Name="WIRef" Nullable="true" />
+        </ComplexType>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2008/09/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="KanbanMdlStoreContainer" CdmEntityContainer="KanbanTFSEntities">
+          <EntitySetMapping Name="Projects">
+            <EntityTypeMapping TypeName="KanbanMdl.Project">
+              <MappingFragment StoreEntitySet="Project">
+                <ScalarProperty Name="ProjectID" ColumnName="ProjectID" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="AdminID" ColumnName="AdminID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ProjectStatus1">
+            <EntityTypeMapping TypeName="KanbanMdl.ProjectStatus">
+              <MappingFragment StoreEntitySet="ProjectStatus">
+                <ScalarProperty Name="ProjectStatusID" ColumnName="ProjectStatusID" />
+                <ScalarProperty Name="ProjectID" ColumnName="ProjectID" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Tasks">
+            <EntityTypeMapping TypeName="KanbanMdl.Task">
+              <MappingFragment StoreEntitySet="Task">
+                <ScalarProperty Name="ProjectID" ColumnName="ProjectID" />
+                <ScalarProperty Name="TaskID" ColumnName="TaskID" />
+                <ScalarProperty Name="TFSTaskID" ColumnName="TFSTaskID" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="Descriptions" ColumnName="Descriptions" />
+                <ScalarProperty Name="Comments" ColumnName="Comments" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="TaskAssignments">
+            <EntityTypeMapping TypeName="KanbanMdl.TaskAssignment">
+              <MappingFragment StoreEntitySet="TaskAssignment">
+                <ScalarProperty Name="TaskAssignmentID" ColumnName="TaskAssignmentID" />
+                <ScalarProperty Name="TaskID" ColumnName="TaskID" />
+                <ScalarProperty Name="UserID" ColumnName="UserID" />
+                <ScalarProperty Name="StatusID" ColumnName="StatusID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="TFSWorkItems">
+            <EntityTypeMapping TypeName="KanbanMdl.TFSWorkItem">
+              <MappingFragment StoreEntitySet="TFSWorkItem">
+                <ScalarProperty Name="WorkItemID" ColumnName="WorkItemID" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="Descriptions" ColumnName="Descriptions" />
+                <ScalarProperty Name="AssignedTo" ColumnName="AssignedTo" />
+                <ScalarProperty Name="Attachement" ColumnName="Attachement" />
+                <ScalarProperty Name="Converted" ColumnName="Converted" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Users">
+            <EntityTypeMapping TypeName="KanbanMdl.User">
+              <MappingFragment StoreEntitySet="User">
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="UserID" ColumnName="UserID" />
+                <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="Password" ColumnName="Password" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <AssociationSetMapping Name="UserProjectMap" TypeName="KanbanMdl.UserProjectMap" StoreEntitySet="UserProjectMap">
+            <EndProperty Name="Project">
+              <ScalarProperty Name="ProjectID" ColumnName="ProjectID" />
+            </EndProperty>
+            <EndProperty Name="User">
+              <ScalarProperty Name="UserID" ColumnName="UserID" />
+            </EndProperty>
+          </AssociationSetMapping>
+          <FunctionImportMapping FunctionImportName="GetProjectBoard" FunctionName="KanbanMdl.Store.GetProjectBoard">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="KanbanMdl.GetProjectBoard_Result">
+                <ScalarProperty Name="TaskID" ColumnName="TaskID" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="Descriptions" ColumnName="Descriptions" />
+                <ScalarProperty Name="Comments" ColumnName="Comments" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="UserID" ColumnName="UserID" />
+                <ScalarProperty Name="StatusID" ColumnName="StatusID" />
+                <ScalarProperty Name="WIRef" ColumnName="WIRef" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2008/10/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="True" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="True" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

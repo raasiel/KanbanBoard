@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="2.0" xmlns:edmx="http://schemas.microsoft.com/ado/2008/10/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2008/10/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="4e9f95321a024c0fb3fba08b71a997c1" Name="Diagram1">
+        <EntityTypeShape EntityType="KanbanMdl.Project" Width="1.5" PointX="0.75" PointY="2.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="KanbanMdl.ProjectStatus" Width="1.5" PointX="3" PointY="1.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="KanbanMdl.Task" Width="1.5" PointX="3" PointY="7.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="KanbanMdl.TaskAssignment" Width="1.5" PointX="5.25" PointY="2.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="KanbanMdl.TFSWorkItem" Width="1.5" PointX="5.75" PointY="5.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="KanbanMdl.User" Width="1.5" PointX="3" PointY="4" IsExpanded="true" />
+        <AssociationConnector Association="KanbanMdl.FK__ProjectSt__Proje__0BC6C43E" ManuallyRouted="false" />
+        <AssociationConnector Association="KanbanMdl.FK__TaskAssig__Statu__1A14E395" ManuallyRouted="false" />
+        <AssociationConnector Association="KanbanMdl.FK__TaskAssig__TaskI__182C9B23" ManuallyRouted="false" />
+        <AssociationConnector Association="KanbanMdl.FK__TaskAssig__UserI__1920BF5C" ManuallyRouted="false" />
+        <AssociationConnector Association="KanbanMdl.UserProjectMap" ManuallyRouted="false" />
+        <AssociationConnector Association="KanbanMdl.FK__Task__ProjectID__267ABA7A" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>
