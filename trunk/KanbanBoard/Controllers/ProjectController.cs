@@ -13,11 +13,6 @@ namespace KanbanBoard.Controllers
             return new string[] { "value1", "value2" };
         }
 
-        // GET api/<controller>/5
-        public string Get(int id)
-        {
-            return "value";
-        }
 
         [HttpGet]
         public IQueryable<ProjectStatus> Statuses(int id)

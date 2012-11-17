@@ -1,22 +1,20 @@
-﻿using System.Collections.Generic;
+﻿using KanbanBoard.Data;
+using System.Collections.Generic;
 using System.Web.Http;
 
 namespace KanbanBoard.Controllers
 {
     public class UserController : ApiController
     {
-        // GET api/<controller>
-        public IEnumerable<string> Get()
+
+        [HttpGet]
+        public ICollection<Project> Get(int id)
         {
-            return new string[] { "value1", "value2" };
+            DataAccess da = new DataAccess();
+            return da.GetProjectsForUser(id);
         }
 
-        // GET api/<controller>/5
-        public string Get(int id)
-        {
-            return "value";
-        }
-
+       
         // POST api/<controller>
         public void Post([FromBody]string value)
         {

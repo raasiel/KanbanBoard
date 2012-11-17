@@ -1,33 +1,22 @@
-﻿function FunctionSequencer(kBoard) {
+﻿function Sequencer(state) {
     this.myself = this;
-    this.page = kBoard;
-    // We store functions and their arguments here
-    this.arr = Array();
+    this.state = state;
+    this.queue = Array();
 }
 
-FunctionSequencer.prototype.queueFunc = function (func, args) {
-    // Crate a data structure and store the function pointer
-    // and the arguments for the function and store in internal 
-    // array
-    var data = { 'func': func, 'args': args, 'sequencer': this, 'context': this.page }
-    this.arr.push(data);
+Sequencer.prototype.queueFunc = function (func, args) {
+    var data = { 'func': func, 'args': args, 'sequencer': this, 'state': this.state }
+    this.queue.push(data);
 }
 
-FunctionSequencer.prototype.invokeAll = function () {
-    // Take the first data structure of function and arguments out
-    // then invoke the function pointer with the arguments. Since this is 
-    // also pass ourselves as the callback mechanism
-    firstItem = this.arr.shift();
+Sequencer.prototype.execute = function () {
+    firstItem = this.queue.shift();
     firstItem.func(this, firstItem.args);
 }
 
-FunctionSequencer.prototype.onInvokeComplete = function (self) {
-    // We are here, that means some function has completed async
-    // execution and has called us as the callback. Now we will 
-    // check if there are any more functions left in queue (array)
-    // and invoke if needed
-    if (self.arr.length > 0) {
-        seqitem = self.arr.shift();
+Sequencer.prototype.onExecutionComplete = function (self) {
+    if (self.queue.length > 0) {
+        seqitem = self.queue.shift();
         seqitem.func(self, seqitem.args);
     }
     else {
@@ -40,9 +29,7 @@ function KanbanBoard() {
 
 KanbanBoard.prototype.showBoard = function () {
     
-
-
-    var seq = new FunctionSequencer($kb);
+    var seq = new Sequencer($kb);
     seq.queueFunc(this.getProjectStatuses, null);
     seq.queueFunc(this.getProjectUsers, null);
     seq.queueFunc(this.getProjectItems, null);
@@ -52,59 +39,91 @@ KanbanBoard.prototype.showBoard = function () {
 
         board = $("#divBoard");
 
-        boardTable = $("<table id='tblBoard'></table>");
+        boardTable = $("<table id='tblBoard' class='striped'></table>");
         board.append(boardTable);
 
+        colors = new ColorWheel();
+        thead = $("<thead></thead>");
+
+        boardTable.append(thead);
         tr = $("<tr id='row_master'></tr>");
-        tr.append("<td></td>");
-        
-        for (j = 0; j < self.projectStatuses.length; j++) {
-            projStatus = self.projectStatuses[j];
-            td = $("<td id='cell_master_status_" + projStatus.ProjectStatusID.toString() + "' >" + projStatus.Name + "</td>")
+        tr.append("<td class=" + colors.nextColor('bg') + "-vlight></td>");
+        //console.log(kbSelf);
+        for (j = 0; j < kbSelf.projectStatuses.length; j++) {
+            projStatus = kbSelf.projectStatuses[j];
+            td = $("<th id='cell_master_status_" + projStatus.ProjectStatusID.toString() +
+                "' class='" + colors.nextColor('bg') + "-vlight' style='width:150px' >" + projStatus.Name + "</th>")
             tr.append(td);
         }
-        boardTable.append(tr);
+        thead.append(tr);
 
-        for (i = 0; i < self.projectUsers.length; i++) {
-            user = self.projectUsers[i];
+        tbody = $("<tbody id='tbBoard'></tbody>");
+        
+        for (i = 0; i < kbSelf.projectUsers.length; i++) {
+            user = kbSelf.projectUsers[i];
             tr = $("<tr id='row_user_" + user.UserID.toString() + "'></tr>");
+            trIndicator = $("<tr id='row_indicator_user_" + user.UserID.toString() + "'></tr>");
+            colors.reset();
+            tr.append("<td id='cell_user_master_" + user.UserID.toString() +
+                "' >" + user.Name + "</td>");
+            trIndicator.append("<td id='cell_user_master_" + user.UserID.toString() +
+                "' class='" + colors.nextColor('bg') + "-vlight'  ></td>");
 
-            tr.append("<td id='cell_user_master_" + user.UserID.toString() + "' >" + user.Name + "</td>");
-            for (j = 0; j < self.projectStatuses.length; j++) {
-                projStatus = self.projectStatuses[j];
+            for (j = 0; j < kbSelf.projectStatuses.length; j++) {
+                //console.log(kbSelf);
+                projStatus = kbSelf.projectStatuses[j];
                 td = $("<td id='cell_user_" + user.UserID.toString() +
-                    "_status_" + projStatus.ProjectStatusID.toString() + "' ></td>")
-                td.append("<div id='div_user_" + user.UserID.toString() +
-                    "_status_" + projStatus.ProjectStatusID.toString() + "' ></div>");
+                    "_status_" + projStatus.ProjectStatusID.toString() +
+                    "' ></td>")
+                
+                colorClass = colors.nextColor('bg');
+                td[0].colorClass = colorClass;
+                tdIndicator = $("<td id='cell_indicator_user_" + user.UserID.toString() +
+                    "_status_" + projStatus.ProjectStatusID.toString() +
+                    "' class='" + colorClass + "-light'></td>")
+                container = new TaskContainer(user, projStatus, td[0]);
+                //console.log(kbSelf);
+
+                /*
+                divCell = $("<div id='div_user_" + user.UserID.toString() +
+                    "_status_" + projStatus.ProjectStatusID.toString() + "' class='listview kbTaskHost' ></div>");                
+                divCell[0].status = projStatus; divCell[0].user = user;
+                projStatus.taskColorClass = colorClass;                
+                td.append(divCell);
+                */
 
                 tr.append(td);
+                trIndicator.append(tdIndicator);
             }
-            boardTable.append(tr);
+            tbody.append(trIndicator);
+            tbody.append(tr);
+
         }
+        boardTable.append(tbody);
 
         if (callback != undefined && callback != null) {
-            callback.onInvokeComplete(callback);
+            callback.onExecutionComplete(callback);
         }
     });
     
     seq.queueFunc(this.loadProjectItems, null);
 
-    seq.invokeAll();
+    seq.execute();
 }
 
 KanbanBoard.prototype.loadProjectItems = function (callback, args) {
-    self = this.context;
+    kbSelf = this.state;
 
-    $.each(self.projectTasks, function (index, item) {
-        divHostId = "div_user_" + item.UserID.toString() + "_status_" + item.StatusID.toString();
-        $("#" + divHostId).append("<span>" + item.Title + "</span>");
+    $.each(kbSelf.projectTasks, function (index, item) {
+        divHostId = "#div_user_" + item.UserID.toString() + "_status_" + item.StatusID.toString();
+        taskContainer = $(divHostId)[0].taskContainer;
+        taskContainer.createTask(item);
     });
 
 }
 
-
 KanbanBoard.prototype.getProjectItems = function (callback, args) {
-    self = this.context;
+    kbSelf = this.state;
     $.ajax(
     {
         type: "GET",
@@ -112,9 +131,9 @@ KanbanBoard.prototype.getProjectItems = function (callback, args) {
         contentType: "application/json; charset=utf-8",
         dataType: "json",
         success: function (data) {
-            self.projectTasks = data;
+            kbSelf.projectTasks = data;
             if (callback != undefined && callback != null) {
-                callback.onInvokeComplete(callback);
+                callback.onExecutionComplete(callback);
             }
         },
         error: function (request, status, error) {
@@ -126,7 +145,7 @@ KanbanBoard.prototype.getProjectItems = function (callback, args) {
 
 
 KanbanBoard.prototype.getProjectStatuses = function (callback, args) {
-    self = this.context;
+    kbSelf = this.state;
     $.ajax(
     {
         type: "GET",
@@ -134,9 +153,9 @@ KanbanBoard.prototype.getProjectStatuses = function (callback, args) {
         contentType: "application/json; charset=utf-8",
         dataType: "json",
         success: function (data) {
-            self.projectStatuses = data;
+            kbSelf.projectStatuses = data;
             if (callback != undefined && callback != null) {
-                callback.onInvokeComplete(callback);
+                callback.onExecutionComplete(callback);
             }
         },
         error: function (request, status, error) {
@@ -146,7 +165,7 @@ KanbanBoard.prototype.getProjectStatuses = function (callback, args) {
 }
 
 KanbanBoard.prototype.getProjectUsers = function (callback, args) {
-    self = this.context;
+    kbSelf = this.state;
     $.ajax(
     {
         type: "GET",
@@ -154,9 +173,9 @@ KanbanBoard.prototype.getProjectUsers = function (callback, args) {
         contentType: "application/json; charset=utf-8",
         dataType: "json",
         success: function (data) {
-            self.projectUsers= data;
+            kbSelf.projectUsers = data;
             if (callback != undefined && callback != null) {
-                callback.onInvokeComplete(callback);
+                callback.onExecutionComplete(callback);
             }
         },
         error: function (request, status, error) {
@@ -165,7 +184,131 @@ KanbanBoard.prototype.getProjectUsers = function (callback, args) {
     });
 }
 
+function ColorWheel() {
 
+    colorwheelself = this;
+    this.colors = [
+         '-color-blue',         '-color-blueLight',     '-color-blueDark'
+        ,'-color-green',        '-color-greenLight',    '-color-greenDark'
+        ,'-color-red',          '-color-yellow',        '-color-orange'
+        ,'-color-orangeDark',   '-color-pink',          '-color-pinkDark'
+        ,'-color-purple',       '-color-darken',        '-color-white'
+        ,'-color-grayDark'
+    ]
+
+    this.index = 0;
+
+    this.lightColors = [];
+
+    /*
+    this.styleKeys = {};
+    
+    $.each(document.styleSheets[0].cssRules, function (index, rule) {
+        try { colorwheelself.styleKeys[rule.selectorText] = rule; } catch (e) { }
+    });
+    
+    console.log(this.styleKeys);
+    $.each(this.colors, function (index, name) {
+        if (colorwheelself.styleKeys[".bg" +name] != undefined) {
+            console.log(colorwheelself.styleKeys[".bg" +name].style.backgroundColor);
+        }
+    });
+    */
+
+    ColorWheel.prototype.nextColor = function (prefix){
+        className = prefix + colorwheelself.colors[colorwheelself.index];
+        colorwheelself.index++;
+        if (colorwheelself.index >= colorwheelself.colors.length) {
+            colorwheelself.index = 0;
+        }
+        return className;
+    }
+
+    ColorWheel.prototype.reset = function (){
+        colorwheelself.index = 0;
+    }
+}
+
+function TaskContainer(user, status, parentElement) {
+    
+    var tcSelf = this;
+    cssClass = 'listview kbTaskHost';
+
+    tcSelf.user = user;
+    tcSelf.status = status;
+    tcSelf.ui = $("<div id='div_user_" + user.UserID.toString() +
+                "_status_" + status.ProjectStatusID.toString() + "' class='" + cssClass + "' ></div>")[0];
+    tcSelf.ui.taskContainer = tcSelf;
+    tcSelf.colorClass = parentElement.colorClass;
+    $(parentElement).append(tcSelf.ui);
+
+    tcSelf.tasks = {};
+
+    TaskContainer.prototype.createTask = function (boardItem) {
+        tcSelf = this;
+        ti = new TaskItem(boardItem);
+        
+        ti.createUI(tcSelf);
+        tcSelf.tasks[ti.ui.id] = ti;
+    }
+
+    TaskContainer.prototype.takeOwnership = function (taskItem) {
+    }
+
+}
+
+function TaskItem(boardItem) {
+
+    tiSelf = this;
+    tiSelf.item = boardItem;
+    tiSelf.parent = null;
+
+    TaskItem.prototype.createUI = function (taskContainer) {
+        tiSelf = this;
+        tiSelf.parent = taskContainer;
+        htmlTaskId = tiSelf.item.TaskID.toString(); // "_user_" + tiSelf.item.UserID.toString() + "_status_" + tiSelf.item.StatusID.toString();
+        tiSelf.ui = $("<div id='divTask" + htmlTaskId + "' class='kbTask'></div>")[0];
+        $(taskContainer.ui).append(tiSelf.ui);
+        //console.log(taskContainer.ui);
+        tiSelf.ui.task = tiSelf;
+        tiSelfUI = $(tiSelf.ui);
+        tiSelfUI.addClass(tiSelf.parent.colorClass + "-vlight");
+        span = $("<span id='taskLabel" + htmlTaskId + "'>" + tiSelf.item.Title + "</span>");
+        //console.log(span);
+        tiSelfUI.append(span);
+
+        tiSelfUI.draggable({
+            containment: "#tbBoard",
+            opacity: 0.7 /*,
+            drag: function () {
+                taskdiv = $(this);
+                window.a = taskdiv;
+            }*/
+        });
+        $(".listview").droppable({
+            hoverClass:'kbTaskHover',
+            drop: function (event, ui) {                
+                current = $(this)[0];
+                tiSelf.changeParent(current.taskContainer);
+                return;
+                tiSelf.parent = current.taskContainer;
+                tiSelfUI = $(tiSelf.ui)
+                tiSelfUI.attr("class", "")
+                tiSelfUI.addClass(tiSelf.parent.colorClass + "-vlight");
+                tiSelfUI.addClass("kbTask");
+            }
+        });
+    }
+
+    TaskItem.prototype.changeParent = function (newParent) {
+        tiSelf = this;
+        oldParent = tiSelf.parent;
+        $(tiSelf.ui).detach();
+        oldParent.tasks[tiSelf.ui.id] = null;
+        tiSelf.createUI(newParent);
+
+    }
+}
 
 $kb = new KanbanBoard();
 $kb.showBoard();

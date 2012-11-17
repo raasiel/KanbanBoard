@@ -53,5 +53,21 @@ namespace KanbanBoard.Data
             }
             return lst;
         }
+
+
+        public ICollection<Project> GetProjectsForUser(int userID)
+        {
+            KanbanBoard.Data.KanbanTFSEntities kt = new KanbanTFSEntities();
+
+            var result = from usr in kt.Users
+                         where usr.UserID == userID
+                         select usr;
+            foreach (var usr in result)
+            {
+                return usr.Projects;
+            }
+            return null;
+
+        }
     }
 }
