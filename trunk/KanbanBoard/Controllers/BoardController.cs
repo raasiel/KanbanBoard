@@ -24,19 +24,11 @@ namespace KanbanBoard.Controllers
             return da.GetProjectBoard(id);
         }
 
-        // POST api/<controller>
-        public void Post([FromBody]string value)
+        [HttpPost]
+        public bool UpdateTask(Task task)
         {
-        }
-
-        // PUT api/<controller>/5
-        public void Put(int id, [FromBody]string value)
-        {
-        }
-
-        // DELETE api/<controller>/5
-        public void Delete(int id)
-        {
+            DataAccess da = new DataAccess();
+            return da.UpdateTask(task);
         }
     }
 }

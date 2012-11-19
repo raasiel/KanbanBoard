@@ -9,4 +9,15 @@
 <article>
     <div id="divBoard"></div>
 </article>
-
+<script>
+$kb = null;
+$(document).ready(function () {
+    $("body").css("-webkit-user-select", "none");
+    $("body").css("-moz-user-select", "none");
+    $("body").css("-ms-user-select", "none");
+    $("body").css("-o-user-select", "none");
+    $("body").css("user-select", "none");
+    $kb = new KanbanBoard();
+    $kb.showBoard();
+});
+</script>

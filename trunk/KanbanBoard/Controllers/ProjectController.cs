@@ -7,12 +7,6 @@ namespace KanbanBoard.Controllers
 {
     public class ProjectController : ApiController
     {
-        // GET api/<controller>
-        public IEnumerable<string> Get()
-        {
-            return new string[] { "value1", "value2" };
-        }
-
 
         [HttpGet]
         public IQueryable<ProjectStatus> Statuses(int id)
@@ -28,20 +22,11 @@ namespace KanbanBoard.Controllers
             return da.GetProjectUsers(id);
         }
 
-
-        // POST api/<controller>
-        public void Post([FromBody]string value)
+        [HttpGet]
+        public ICollection<Project> UserProjects(int id)
         {
-        }
-
-        // PUT api/<controller>/5
-        public void Put(int id, [FromBody]string value)
-        {
-        }
-
-        // DELETE api/<controller>/5
-        public void Delete(int id)
-        {
+            DataAccess da = new DataAccess();
+            return da.GetProjectsForUser(id);
         }
     }
 }

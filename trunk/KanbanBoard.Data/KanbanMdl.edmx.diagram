@@ -8,15 +8,13 @@
         <EntityTypeShape EntityType="KanbanMdl.Project" Width="1.5" PointX="0.75" PointY="2.625" IsExpanded="true" />
         <EntityTypeShape EntityType="KanbanMdl.ProjectStatus" Width="1.5" PointX="3" PointY="1.25" IsExpanded="true" />
         <EntityTypeShape EntityType="KanbanMdl.Task" Width="1.5" PointX="3" PointY="7.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="KanbanMdl.TaskAssignment" Width="1.5" PointX="5.25" PointY="2.5" IsExpanded="true" />
         <EntityTypeShape EntityType="KanbanMdl.TFSWorkItem" Width="1.5" PointX="5.75" PointY="5.75" IsExpanded="true" />
         <EntityTypeShape EntityType="KanbanMdl.User" Width="1.5" PointX="3" PointY="4" IsExpanded="true" />
         <AssociationConnector Association="KanbanMdl.FK__ProjectSt__Proje__0BC6C43E" ManuallyRouted="false" />
-        <AssociationConnector Association="KanbanMdl.FK__TaskAssig__Statu__1A14E395" ManuallyRouted="false" />
-        <AssociationConnector Association="KanbanMdl.FK__TaskAssig__TaskI__182C9B23" ManuallyRouted="false" />
-        <AssociationConnector Association="KanbanMdl.FK__TaskAssig__UserI__1920BF5C" ManuallyRouted="false" />
         <AssociationConnector Association="KanbanMdl.UserProjectMap" ManuallyRouted="false" />
         <AssociationConnector Association="KanbanMdl.FK__Task__ProjectID__267ABA7A" />
+        <AssociationConnector Association="KanbanMdl.FK__Task__UserID__24927208" />
+        <AssociationConnector Association="KanbanMdl.FK__Task__StatusID__267ABA7A" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

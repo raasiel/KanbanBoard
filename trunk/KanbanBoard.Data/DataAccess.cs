@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.TeamFoundation.Client;
+using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace KanbanBoard.Data
@@ -8,6 +10,10 @@ namespace KanbanBoard.Data
         private void Test()
         {
             KanbanBoard.Data.KanbanTFSEntities kt = new KanbanTFSEntities();
+            TeamFoundationServer tiServer = TeamFoundationServerFactory.GetServer ("https://cmr.wkglobal.com:8088");
+            //tiServer.Credentials = new System.Net.NetworkCredential ("Shafqat.Ahmed", "Hello123","NA");
+            tiServer.Authenticate();
+
         }
 
         public IQueryable<Project> GetProjects()
@@ -69,5 +75,28 @@ namespace KanbanBoard.Data
             return null;
 
         }
+
+        public bool UpdateTask(Task task)
+        {
+            KanbanBoard.Data.KanbanTFSEntities kt = new KanbanTFSEntities();
+
+            var result = from tsk in kt.Tasks
+                         where tsk.TaskID == task.TaskID
+                         select tsk;
+            foreach (var tsk in result)
+            {
+                tsk.ProjectID = task.ProjectID;
+                tsk.TFSTaskID = task.TFSTaskID;
+                tsk.Title = task.Title;
+                //tsk.Descriptions = task.Descriptions;
+                tsk.UserID = task.UserID;
+                tsk.StatusID = task.StatusID;
+                
+                
+            }
+            kt.SaveChanges();
+            return true;
+        }
+
     }
 }

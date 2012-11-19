@@ -16,8 +16,8 @@ namespace KanbanBoard.Data
     {
         public User()
         {
-            this.TaskAssignments = new HashSet<TaskAssignment>();
             this.Projects = new HashSet<Project>();
+            this.Tasks = new HashSet<Task>();
         }
     
         public int UserID { get; set; }
@@ -25,7 +25,7 @@ namespace KanbanBoard.Data
         public string Password { get; set; }
         public string Name { get; set; }
     
-         internal  ICollection<TaskAssignment> TaskAssignments { get; set; }
          internal  ICollection<Project> Projects { get; set; }
+         internal  ICollection<Task> Tasks { get; set; }
     }
 }

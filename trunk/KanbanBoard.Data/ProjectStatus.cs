@@ -16,7 +16,7 @@ namespace KanbanBoard.Data
     {
         public ProjectStatus()
         {
-            this.TaskAssignments = new HashSet<TaskAssignment>();
+            this.Tasks = new HashSet<Task>();
         }
     
         public int ProjectStatusID { get; set; }
@@ -24,6 +24,6 @@ namespace KanbanBoard.Data
         public string Name { get; set; }
     
          internal  Project Project { get; set; }
-         internal  ICollection<TaskAssignment> TaskAssignments { get; set; }
+         internal  ICollection<Task> Tasks { get; set; }
     }
 }

@@ -1,4 +1,6 @@
-﻿function Sequencer(state) {
+﻿$projectID = "1";
+
+function Sequencer(state) {
     this.myself = this;
     this.state = state;
     this.queue = Array();
@@ -39,7 +41,7 @@ KanbanBoard.prototype.showBoard = function () {
 
         board = $("#divBoard");
 
-        boardTable = $("<table id='tblBoard' class='striped'></table>");
+        boardTable = $("<table id='tblBoard' class='kbBoardTable'></table>");
         board.append(boardTable);
 
         colors = new ColorWheel();
@@ -47,7 +49,9 @@ KanbanBoard.prototype.showBoard = function () {
 
         boardTable.append(thead);
         tr = $("<tr id='row_master'></tr>");
-        tr.append("<td class=" + colors.nextColor('bg') + "-vlight></td>");
+        //colors.nextColor('bg');
+        //tr.append("<td class='" + colors.nextColor('bg') + "-vlight'></td>");
+        tr.append("<td class='kbUser'></td>");        
         //console.log(kbSelf);
         for (j = 0; j < kbSelf.projectStatuses.length; j++) {
             projStatus = kbSelf.projectStatuses[j];
@@ -61,13 +65,15 @@ KanbanBoard.prototype.showBoard = function () {
         
         for (i = 0; i < kbSelf.projectUsers.length; i++) {
             user = kbSelf.projectUsers[i];
-            tr = $("<tr id='row_user_" + user.UserID.toString() + "'></tr>");
+            tr = $("<tr id='row_user_" + user.UserID.toString() + "'></tr>");            
             trIndicator = $("<tr id='row_indicator_user_" + user.UserID.toString() + "'></tr>");
             colors.reset();
+            //colors.nextColor('bg');
+
             tr.append("<td id='cell_user_master_" + user.UserID.toString() +
-                "' >" + user.Name + "</td>");
+                "' class='kbUser'>" + user.Name + "</td>");
             trIndicator.append("<td id='cell_user_master_" + user.UserID.toString() +
-                "' class='" + colors.nextColor('bg') + "-vlight'  ></td>");
+                "' class='kbUser'  ></td>");
 
             for (j = 0; j < kbSelf.projectStatuses.length; j++) {
                 //console.log(kbSelf);
@@ -80,7 +86,7 @@ KanbanBoard.prototype.showBoard = function () {
                 td[0].colorClass = colorClass;
                 tdIndicator = $("<td id='cell_indicator_user_" + user.UserID.toString() +
                     "_status_" + projStatus.ProjectStatusID.toString() +
-                    "' class='" + colorClass + "-light'></td>")
+                    "' class='" + colorClass + "-vlight kbTaskIndicator'></td>")
                 container = new TaskContainer(user, projStatus, td[0]);
                 //console.log(kbSelf);
 
@@ -127,7 +133,7 @@ KanbanBoard.prototype.getProjectItems = function (callback, args) {
     $.ajax(
     {
         type: "GET",
-        url: "/api/board/get/1",
+        url: "/api/board/get/" + $projectID,
         contentType: "application/json; charset=utf-8",
         dataType: "json",
         success: function (data) {
@@ -149,7 +155,7 @@ KanbanBoard.prototype.getProjectStatuses = function (callback, args) {
     $.ajax(
     {
         type: "GET",
-        url: "/api/project/statuses/1",
+        url: "/api/project/statuses/" + $projectID,
         contentType: "application/json; charset=utf-8",
         dataType: "json",
         success: function (data) {
@@ -169,7 +175,7 @@ KanbanBoard.prototype.getProjectUsers = function (callback, args) {
     $.ajax(
     {
         type: "GET",
-        url: "/api/project/users/1",
+        url: "/api/project/users/" + $projectID,
         contentType: "application/json; charset=utf-8",
         dataType: "json",
         success: function (data) {
@@ -188,12 +194,14 @@ function ColorWheel() {
 
     colorwheelself = this;
     this.colors = [
-         '-color-blue',         '-color-blueLight',     '-color-blueDark'
-        ,'-color-green',        '-color-greenLight',    '-color-greenDark'
-        ,'-color-red',          '-color-yellow',        '-color-orange'
-        ,'-color-orangeDark',   '-color-pink',          '-color-pinkDark'
+        '-color-orange', '-color-yellow',  '-color-greenLight'
+        , '-color-green','-color-red'
+        ,'-color-blue', '-color-blueLight', '-color-blueDark'
+        , '-color-greenDark'
+                          
+        ,   '-color-pink',          '-color-pinkDark'
         ,'-color-purple',       '-color-darken',        '-color-white'
-        ,'-color-grayDark'
+        , '-color-grayDark', '-color-orangeDark'
     ]
 
     this.index = 0;
@@ -276,26 +284,25 @@ function TaskItem(boardItem) {
         span = $("<span id='taskLabel" + htmlTaskId + "'>" + tiSelf.item.Title + "</span>");
         //console.log(span);
         tiSelfUI.append(span);
-
         tiSelfUI.draggable({
             containment: "#tbBoard",
-            opacity: 0.7 /*,
+            opacity: 0.7,
+            helper: "clone",
+            cursor:"pointer"
+            /*,
             drag: function () {
                 taskdiv = $(this);
                 window.a = taskdiv;
             }*/
         });
-        $(".listview").droppable({
+        $(".kbTaskHost").droppable({
             hoverClass:'kbTaskHover',
             drop: function (event, ui) {                
+                //current = $(this).children("div.listview")[0];
                 current = $(this)[0];
-                tiSelf.changeParent(current.taskContainer);
+                taskItem = ui.draggable[0].task;
+                taskItem.changeParent(current.taskContainer);
                 return;
-                tiSelf.parent = current.taskContainer;
-                tiSelfUI = $(tiSelf.ui)
-                tiSelfUI.attr("class", "")
-                tiSelfUI.addClass(tiSelf.parent.colorClass + "-vlight");
-                tiSelfUI.addClass("kbTask");
             }
         });
     }
@@ -307,8 +314,32 @@ function TaskItem(boardItem) {
         oldParent.tasks[tiSelf.ui.id] = null;
         tiSelf.createUI(newParent);
 
+        tiSelf.item.UserID = tiSelf.parent.user.UserID;
+        tiSelf.item.StatusID = tiSelf.parent.status.ProjectStatusID;
+
+        task = {
+            'TaskID': tiSelf.item.TaskID, 
+            'UserID': tiSelf.item.UserID, 
+            'StatusID': tiSelf.item.StatusID,
+            'Title':tiSelf.item.Title,
+            'Descriptions':tiSelf.item.Description,
+            'ProjectID': parseInt ($projectID), // todo
+            'TFSTaskID':0
+        };
+
+        $.ajax(
+        {
+            type: "POST",
+            url: "/api/board/updatetask",
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            data:JSON.stringify(task),
+            success: function (data) {
+            },
+            error: function (request, status, error) {
+                alert("Could not load Project Status  from database.");
+            }
+        });
     }
 }
 
-$kb = new KanbanBoard();
-$kb.showBoard();

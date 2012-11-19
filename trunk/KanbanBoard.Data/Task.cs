@@ -14,19 +14,17 @@ namespace KanbanBoard.Data
     
     public partial class Task
     {
-        public Task()
-        {
-            this.TaskAssignments = new HashSet<TaskAssignment>();
-        }
-    
         public int TaskID { get; set; }
         public Nullable<int> TFSTaskID { get; set; }
         public string Title { get; set; }
         public string Descriptions { get; set; }
         public string Comments { get; set; }
         public Nullable<int> ProjectID { get; set; }
+        public int UserID { get; set; }
+        public int StatusID { get; set; }
     
-         internal  ICollection<TaskAssignment> TaskAssignments { get; set; }
          internal  Project Project { get; set; }
+         internal  User User { get; set; }
+         internal  ProjectStatus ProjectStatu { get; set; }
     }
 }
