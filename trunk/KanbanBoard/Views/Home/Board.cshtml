@@ -1,11 +1,18 @@
 ﻿@{
     ViewBag.Title = "Project Board";
 }
-<hgroup class="title">
-    <h1>@ViewBag.Title.</h1>
-    <h2>@ViewBag.Message</h2>
-</hgroup>
-
+<div class="navigation-bar">
+    <div class="navigation-bar-inner">
+        <div class="brand">
+            <span class="name">Project Board</span>
+        </div>
+        <ul class="place-right">
+            <li>
+                <a href="javascript:$kb.show/Task(); ">+ Add Task</a>
+            </li>
+        </ul>
+    </div>
+</div>
 <article>
     <div id="divBoard"></div>
 </article>
@@ -19,5 +26,6 @@ $(document).ready(function () {
     $("body").css("user-select", "none");
     $kb = new KanbanBoard();
     $kb.showBoard();
+    //window.setTime    out("$kb.showNewTask();", 1000);
 });
 </script>

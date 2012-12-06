@@ -9,6 +9,8 @@
           <EntitySet Name="Project" EntityType="KanbanMdl.Store.Project" store:Type="Tables" Schema="dbo" />
           <EntitySet Name="ProjectStatus" EntityType="KanbanMdl.Store.ProjectStatus" store:Type="Tables" Schema="dbo" />
           <EntitySet Name="Task" EntityType="KanbanMdl.Store.Task" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="TfsConnection" EntityType="KanbanMdl.Store.TfsConnection" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="TfsQuery" EntityType="KanbanMdl.Store.TfsQuery" store:Type="Tables" Schema="dbo" />
           <EntitySet Name="TFSWorkItem" EntityType="KanbanMdl.Store.TFSWorkItem" store:Type="Tables" Schema="dbo" />
           <EntitySet Name="User" EntityType="KanbanMdl.Store.User" store:Type="Tables" Schema="dbo" />
           <EntitySet Name="UserProjectMap" EntityType="KanbanMdl.Store.UserProjectMap" store:Type="Tables" Schema="dbo" />
@@ -28,6 +30,10 @@
             <End Role="User" EntitySet="User" />
             <End Role="Task" EntitySet="Task" />
           </AssociationSet>
+          <AssociationSet Name="FK__TfsQuery__TfsCon__38996AB5" Association="KanbanMdl.Store.FK__TfsQuery__TfsCon__38996AB5">
+            <End Role="TfsConnection" EntitySet="TfsConnection" />
+            <End Role="TfsQuery" EntitySet="TfsQuery" />
+          </AssociationSet>
           <AssociationSet Name="FK__UserProje__Proje__21B6055D" Association="KanbanMdl.Store.FK__UserProje__Proje__21B6055D">
             <End Role="Project" EntitySet="Project" />
             <End Role="UserProjectMap" EntitySet="UserProjectMap" />
@@ -44,6 +50,8 @@
           <Property Name="ProjectID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
           <Property Name="Name" Type="varchar" Nullable="false" MaxLength="256" />
           <Property Name="AdminID" Type="int" Nullable="false" />
+          <Property Name="TfsQueryID" Type="int" />
+          <Property Name="SyncInterval" Type="int" />
         </EntityType>
         <EntityType Name="ProjectStatus">
           <Key>
@@ -65,6 +73,25 @@
           <Property Name="ProjectID" Type="int" />
           <Property Name="UserID" Type="int" Nullable="false" />
           <Property Name="StatusID" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="TfsConnection">
+          <Key>
+            <PropertyRef Name="TfsConfigID" />
+          </Key>
+          <Property Name="TfsConfigID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="TfsUrl" Type="nvarchar" Nullable="false" MaxLength="150" />
+          <Property Name="Username" Type="nvarchar" Nullable="false" MaxLength="50" />
+          <Property Name="Password" Type="nvarchar" Nullable="false" MaxLength="50" />
+          <Property Name="ProjectCollectionGuid" Type="varchar" MaxLength="50" />
+          <Property Name="Domain" Type="varchar" Nullable="false" MaxLength="20" />
+        </EntityType>
+        <EntityType Name="TfsQuery">
+          <Key>
+            <PropertyRef Name="TfsQueryID" />
+          </Key>
+          <Property Name="TfsQueryID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="QuerySrting" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="TfsConfigID" Type="int" />
         </EntityType>
         <EntityType Name="TFSWorkItem">
           <Key>
@@ -142,6 +169,18 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK__TfsQuery__TfsCon__38996AB5">
+          <End Role="TfsConnection" Type="KanbanMdl.Store.TfsConnection" Multiplicity="0..1" />
+          <End Role="TfsQuery" Type="KanbanMdl.Store.TfsQuery" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="TfsConnection">
+              <PropertyRef Name="TfsConfigID" />
+            </Principal>
+            <Dependent Role="TfsQuery">
+              <PropertyRef Name="TfsConfigID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK__UserProje__Proje__21B6055D">
           <End Role="Project" Type="KanbanMdl.Store.Project" Multiplicity="1" />
           <End Role="UserProjectMap" Type="KanbanMdl.Store.UserProjectMap" Multiplicity="*" />
@@ -202,6 +241,12 @@
             <End Role="ProjectStatus" EntitySet="ProjectStatus1" />
             <End Role="Task" EntitySet="Tasks" />
           </AssociationSet>
+          <EntitySet Name="TfsConnections" EntityType="KanbanMdl.TfsConnection" />
+          <EntitySet Name="TfsQueries" EntityType="KanbanMdl.TfsQuery" />
+          <AssociationSet Name="FK__TfsQuery__TfsCon__38996AB5" Association="KanbanMdl.FK__TfsQuery__TfsCon__38996AB5">
+            <End Role="TfsConnection" EntitySet="TfsConnections" />
+            <End Role="TfsQuery" EntitySet="TfsQueries" />
+          </AssociationSet>
         </EntityContainer>
         <EntityType Name="Project">
           <Key>
@@ -213,6 +258,8 @@
           <NavigationProperty Name="ProjectStatus" Relationship="KanbanMdl.FK__ProjectSt__Proje__0BC6C43E" FromRole="Project" ToRole="ProjectStatus" />
           <NavigationProperty Name="Users" Relationship="KanbanMdl.UserProjectMap" FromRole="Project" ToRole="User" />
           <NavigationProperty Name="Tasks" Relationship="KanbanMdl.FK__Task__ProjectID__267ABA7A" FromRole="Project" ToRole="Task" />
+          <Property Type="Int32" Name="TfsQueryID" />
+          <Property Type="Int32" Name="SyncInterval" />
         </EntityType>
         <EntityType Name="ProjectStatus">
           <Key>
@@ -324,6 +371,39 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <EntityType Name="TfsConnection">
+          <Key>
+            <PropertyRef Name="TfsConfigID" />
+          </Key>
+          <Property Type="Int32" Name="TfsConfigID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="String" Name="TfsUrl" Nullable="false" MaxLength="150" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Username" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Password" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="ProjectCollectionGuid" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="Domain" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="TfsQueries" Relationship="KanbanMdl.FK__TfsQuery__TfsCon__38996AB5" FromRole="TfsConnection" ToRole="TfsQuery" />
+        </EntityType>
+        <EntityType Name="TfsQuery">
+          <Key>
+            <PropertyRef Name="TfsQueryID" />
+          </Key>
+          <Property Type="Int32" Name="TfsQueryID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="String" Name="QuerySrting" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Type="Int32" Name="TfsConfigID" />
+          <NavigationProperty Name="TfsConnection" Relationship="KanbanMdl.FK__TfsQuery__TfsCon__38996AB5" FromRole="TfsQuery" ToRole="TfsConnection" />
+        </EntityType>
+        <Association Name="FK__TfsQuery__TfsCon__38996AB5">
+          <End Type="KanbanMdl.TfsConnection" Role="TfsConnection" Multiplicity="0..1" />
+          <End Type="KanbanMdl.TfsQuery" Role="TfsQuery" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="TfsConnection">
+              <PropertyRef Name="TfsConfigID" />
+            </Principal>
+            <Dependent Role="TfsQuery">
+              <PropertyRef Name="TfsConfigID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -333,6 +413,8 @@
           <EntitySetMapping Name="Projects">
             <EntityTypeMapping TypeName="KanbanMdl.Project">
               <MappingFragment StoreEntitySet="Project">
+                <ScalarProperty Name="SyncInterval" ColumnName="SyncInterval" />
+                <ScalarProperty Name="TfsQueryID" ColumnName="TfsQueryID" />
                 <ScalarProperty Name="ProjectID" ColumnName="ProjectID" />
                 <ScalarProperty Name="Name" ColumnName="Name" />
                 <ScalarProperty Name="AdminID" ColumnName="AdminID" />
@@ -406,6 +488,27 @@
               </ComplexTypeMapping>
             </ResultMapping>
           </FunctionImportMapping>
+          <EntitySetMapping Name="TfsConnections">
+            <EntityTypeMapping TypeName="KanbanMdl.TfsConnection">
+              <MappingFragment StoreEntitySet="TfsConnection">
+                <ScalarProperty Name="Domain" ColumnName="Domain" />
+                <ScalarProperty Name="ProjectCollectionGuid" ColumnName="ProjectCollectionGuid" />
+                <ScalarProperty Name="Password" ColumnName="Password" />
+                <ScalarProperty Name="Username" ColumnName="Username" />
+                <ScalarProperty Name="TfsUrl" ColumnName="TfsUrl" />
+                <ScalarProperty Name="TfsConfigID" ColumnName="TfsConfigID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="TfsQueries">
+            <EntityTypeMapping TypeName="KanbanMdl.TfsQuery">
+              <MappingFragment StoreEntitySet="TfsQuery">
+                <ScalarProperty Name="TfsConfigID" ColumnName="TfsConfigID" />
+                <ScalarProperty Name="QuerySrting" ColumnName="QuerySrting" />
+                <ScalarProperty Name="TfsQueryID" ColumnName="TfsQueryID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

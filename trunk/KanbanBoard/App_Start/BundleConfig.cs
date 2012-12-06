@@ -15,7 +15,10 @@ namespace KanbanBoard
             "~/Scripts/jquery.validate.min.js").Include(
             "~/Scripts/modernizr-2.5.3.js").Include(
             "~/Scripts/knockout-2.1.0.js").Include(
+            "~/Scripts/dropdown.js").Include(
+            "~/Scripts/pagecontrol.js").Include(
             "~/Scripts/kboard.js"));
+
 
             
             bundles.Add(new ScriptBundle("~/bundles/jquery").Include(

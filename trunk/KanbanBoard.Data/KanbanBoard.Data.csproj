@@ -51,7 +51,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BoardItem.cs" />
+    <Compile Include="Model.cs" />
     <Compile Include="DataAccess.cs" />
     <Compile Include="GetProjectBoard_Result.cs">
       <DependentUpon>KanbanMdl.tt</DependentUpon>
@@ -79,6 +79,12 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Task.cs">
+      <DependentUpon>KanbanMdl.tt</DependentUpon>
+    </Compile>
+    <Compile Include="TfsConnection.cs">
+      <DependentUpon>KanbanMdl.tt</DependentUpon>
+    </Compile>
+    <Compile Include="TfsQuery.cs">
       <DependentUpon>KanbanMdl.tt</DependentUpon>
     </Compile>
     <Compile Include="TFSWorkItem.cs">

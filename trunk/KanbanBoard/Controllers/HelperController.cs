@@ -1,4 +1,5 @@
-﻿using KanbanBoard.Models;
+﻿using KanbanBoard.Data;
+using KanbanBoard.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,25 +36,11 @@ namespace KanbanBoard.Controllers
             return ret;
         }
 
-        // GET api/<controller>/5
-        public string Get(int id)
+        [HttpPost]
+        public IEnumerable<Node> GetTfsProjects(TfsConnection conn)
         {
-            return "value";
-        }
-
-        // POST api/<controller>
-        public void Post([FromBody]string value)
-        {
-        }
-
-        // PUT api/<controller>/5
-        public void Put(int id, [FromBody]string value)
-        {
-        }
-
-        // DELETE api/<controller>/5
-        public void Delete(int id)
-        {
+            DataAccess da = new DataAccess();
+            return da.GetTfsProjects(conn);
         }
     }
 }

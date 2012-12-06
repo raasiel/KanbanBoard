@@ -24,6 +24,8 @@ namespace KanbanBoard.Data
         public int ProjectID { get; set; }
         public string Name { get; set; }
         public int AdminID { get; set; }
+        public Nullable<int> TfsQueryID { get; set; }
+        public Nullable<int> SyncInterval { get; set; }
     
          internal  ICollection<ProjectStatus> ProjectStatus { get; set; }
          internal  ICollection<User> Users { get; set; }

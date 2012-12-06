@@ -5,10 +5,62 @@
     <link href="../metro-ui-light.css" rel="stylesheet" />
 </head>
 <body>
-    <div id="main">
-        <div id="divTaskEntry">
-            <div>Enter New Task</div>
-            <div><input /></div>
+    <div id="main" >        
+        <div id="divTaskEntry" class="screenhost" style="width: 800px; ">
+            <h1>Enter New Task</h1>
+            <table border="0" cellpadding="0" cellmargin="0" style="width:100%">
+                <tbody>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2"><span>Title</span></td>
+                        <td colspan="8"><input id="tskTitle" field="Title" /></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2"><span>Description</span></td>
+                        <td colspan="8"><textarea id="tskDescription" field="Descriptions" /></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2"><span>TFS Reference</span></td>
+                        <td colspan="8"><input id="tskTFSTaskID" field="TFSTaskID" /></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2"><span>User</span></td>
+                        <td colspan="3"><select id="tskUserID" field="UserID"></select></td>
+                        <td colspan="2"><span>Status</span></td>
+                        <td colspan="3"><select id="tskStatusID" field="StatusID"></select></td>
+                    </tr>
+                    <tr>
+                        <td colspan="10"> . </td>
+                    </tr>
+                    
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="7"></td>
+                        <td colspan="3">
+                            <div class="toolbar">
+                                <div class="button" action="execute">Save</div>
+                                <div class="button" action="cancel">Cancel</div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="10"></td>
+                    </tr>
+                    
+                </tfoot>
+            </table>
         </div>
     </div>
 </body>

@@ -33,6 +33,8 @@ namespace KanbanBoard.Data
         public DbSet<Task> Tasks { get; set; }
         public DbSet<TFSWorkItem> TFSWorkItems { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<TfsConnection> TfsConnections { get; set; }
+        public DbSet<TfsQuery> TfsQueries { get; set; }
     
         public virtual ObjectResult<GetProjectBoard_Result> GetProjectBoard(Nullable<int> projectID)
         {

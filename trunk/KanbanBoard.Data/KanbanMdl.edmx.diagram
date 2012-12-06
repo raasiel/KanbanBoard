@@ -15,6 +15,9 @@
         <AssociationConnector Association="KanbanMdl.FK__Task__ProjectID__267ABA7A" />
         <AssociationConnector Association="KanbanMdl.FK__Task__UserID__24927208" />
         <AssociationConnector Association="KanbanMdl.FK__Task__StatusID__267ABA7A" />
+        <EntityTypeShape EntityType="KanbanMdl.TfsConnection" Width="1.5" PointX="11.593713886846656" PointY="19.687436813343055" />
+        <EntityTypeShape EntityType="KanbanMdl.TfsQuery" Width="1.5" PointX="1.5615934215307206" PointY="1.4320751435272745" />
+        <AssociationConnector Association="KanbanMdl.FK__TfsQuery__TfsCon__38996AB5" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
