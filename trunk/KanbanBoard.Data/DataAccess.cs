@@ -191,9 +191,7 @@ namespace KanbanBoard.Data
                 tsk.Title = task.Title;
                 tsk.Descriptions = task.Descriptions;
                 tsk.UserID = task.UserID;
-                tsk.StatusID = task.StatusID;
-                
-                
+                tsk.StatusID = task.StatusID;                                
             }
             kt.SaveChanges();
             return true;

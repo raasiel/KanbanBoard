@@ -8,7 +8,7 @@
         </div>
         <ul class="place-right">
             <li>
-                <a href="javascript:$kb.show/Task(); ">+ Add Task</a>
+                <a href="javascript:$kb.showTask(); ">+ Add Task</a>
             </li>
         </ul>
     </div>
@@ -25,7 +25,7 @@ $(document).ready(function () {
     $("body").css("-o-user-select", "none");
     $("body").css("user-select", "none");
     $kb = new KanbanBoard();
-    $kb.showBoard();
+    $kb.init();
     //window.setTime    out("$kb.showNewTask();", 1000);
 });
 </script>

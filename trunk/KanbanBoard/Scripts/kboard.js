@@ -31,13 +31,9 @@ Sequencer.prototype.onExecutionComplete = function (self) {
     }
 }
 
-
-function KanbanBoard() {
-}
-
-KanbanBoard.prototype.showBoard = function () {
-    
-    kbSelf = this;
+function FocusHelper(kanbanBoard) {
+    foc = this;
+    foc.board = kanbanBoard;
 
     // set up the keyboard handler
     document.clearAction = function () {
@@ -50,116 +46,300 @@ KanbanBoard.prototype.showBoard = function () {
         document.actionCancel = cancel;
     }
 
-    $(document).live("keydown", function (e) {
-        _(e);
-        if (e.which == 13) {
-            if (document.actionExecute != null) {
-                elm = document.activeElement;
-                if (elm != null) {
-                    if (elm.tagName != "TEXTAREA") {
-                        document.actionExecute();
-                    }
+    $(document).live("keydown", foc.keyboardHandler);
+    $(".kbTaskHost,.kbTask").live("click", foc.onClickHandler);
+}
+
+FocusHelper.classFocused = "selected";
+FocusHelper.classSelected = "selected";
+FocusHelper.MODE_TASK_BROWSE = "task_browse";
+FocusHelper.MODE_TASK_EDIT = "task_edit";
+
+FocusHelper.prototype.currentRowIndex = 1;
+FocusHelper.prototype.currentColIndex = 1;
+FocusHelper.prototype.currentItemIndex = 0;
+FocusHelper.prototype.currentItem = null;
+FocusHelper.prototype.mode = FocusHelper.MODE_TASK_BROWSE
+FocusHelper.prototype.onClickHandler = function (e) {
+    
+    elmCheck = e.srcElement;
+    if (e.srcElement.tagName == "SPAN") {
+        elmCheck = e.srcElement.parentElement;
+    }
+
+    if ($(elmCheck).hasClass("kbTask")) {
+
+        parent = $(elmCheck.parentElement.parentElement);
+        foc.currentRowIndex = parseInt(parent.attr("row"));
+        foc.currentColIndex = parseInt(parent.attr("col"));
+
+        for (i = 0; i < elmCheck.parentElement.childNodes.length; i++) {
+            if ($(elmCheck.parentElement.childNodes[i]).is(elmCheck)) {
+                foc.currentItemIndex = i;
+                break;
+            }
+        }
+    } else if ($(elmCheck).hasClass("kbTaskHost")) {
+        parent = $(elmCheck.parentElement);
+        foc.currentRowIndex = parseInt(parent.attr("row"));
+        foc.currentColIndex = parseInt(parent.attr("col"));
+        foc.currentItemIndex = 0;
+    } 
+    //_([foc.currentRowIndex, foc.currentColIndex, foc.currentItemIndex]);
+
+    foc.showFocus();
+    return false;
+}
+
+
+
+FocusHelper.prototype.keyboardHandler = function (e) {
+
+    if (e.which == 13) {
+        if (document.actionExecute != null) {
+            elm = document.activeElement;
+            if (elm != null) {
+                if (elm.tagName != "TEXTAREA" && $(elm).hasClass("dd-select")==false) {
+                    document.actionExecute();
                 }
             }
         }
-        else if (e.which == 27) {
-            if (document.actionCancel != null) {
-                document.actionCancel();
+        else if (foc.currentItem != null) {
+            if (foc.currentItem.task != null) {
+                $kb.showTask(foc.currentItem.task.item);
             }
         }
-        else if (e.which == 9) {
-            taskdivs = $(".kbTask");
-            if (selectedTaskIndex != -1) {
-                $(taskdivs[selectedTaskIndex]).toggleClass("selected");
-            }
-            if (e.shiftKey == false) {
-                selectedTaskIndex++;
-            }
-            else {
-                selectedTaskIndex--;
-            }
+    }
+    else if (e.which == 27) {
+        if (document.actionCancel != null) {
+            document.actionCancel();
+        }
+    }
+        /*
+    else if (e.which == 9) {
+        taskdivs = $(".kbTask");
+        if (selectedTaskIndex != -1) {
             $(taskdivs[selectedTaskIndex]).toggleClass("selected");
-            return false;
         }
-        return true;
-    });
+        if (e.shiftKey == false) {
+            selectedTaskIndex++;
+        }
+        else {
+            selectedTaskIndex--;
+        }
+        $(taskdivs[selectedTaskIndex]).toggleClass("selected");
+        return false;
+    }*/
+ 
+    keycode = e.which;
+    if (keycode == 45 && foc.mode == FocusHelper.MODE_TASK_BROWSE) {
+        if ($(foc.currentItem).hasClass("kbTaskHost")){
+            foc.board.newTask(foc.currentItem.userID, foc.currentItem.statusID);
+        }
+    }
 
+    if (keycode >= 37 && keycode <= 40 && foc.mode == FocusHelper.MODE_TASK_BROWSE) {
+
+        rows = $("#divBoard tbody tr");
+        maxrow = rows.length;
+        maxcol = rows[0].children.length;
+
+        if (keycode == 37) {
+            foc.currentColIndex--;
+            foc.currentItemIndex = 0;
+            if (foc.currentColIndex < 1) {
+                foc.currentColIndex = maxcol;
+            }
+        }
+        if (keycode == 38) {
+
+            moveUp = false;
+            if (foc.currentItem != null) {
+                if ($(foc.currentItem).hasClass("kbTask")) {
+                    parent = $(foc.currentItem).parent()[0];
+                    if (foc.currentItemIndex - 1 <0) {
+                        foc.currentItemIndex = 0;
+                        moveUp = true;
+                    } else {
+                        foc.currentItemIndex--;
+                    }
+                } else {
+                    moveUp = true;
+                }
+            } else {
+                moveUp = true;
+            }
+            if (moveUp) {
+                foc.currentItemIndex = 0;
+                if (foc.currentRowIndex < 0) {                    
+                    foc.currentRowIndex = 1;
+                } else {
+                    foc.currentRowIndex = foc.currentRowIndex - 2;
+                }
+
+                probableCell = $("#divBoard tbody tr")[foc.currentRowIndex].children[foc.currentColIndex];
+                //_([probableCell.children.length, $(probableCell).text(), probableCell]);
+                if (probableCell.children[0].children.length > 1) {                    
+                    foc.currentItemIndex = probableCell.children[0].children.length-1;
+                }
+                /* _($(probableCell).text()); */
+            }
+        }
+        if (keycode == 39) {
+            foc.currentColIndex++;
+            foc.currentItemIndex = 0;
+            if (foc.currentColIndex >= maxcol) {
+                foc.currentColIndex = 1;
+            }
+        }
+        if (keycode == 40) {            
+            moveDown = false;
+            if (foc.currentItem != null) {
+                if ($(foc.currentItem).hasClass("kbTask")) {
+                    //_("Is a task")
+                    parent = $(foc.currentItem).parent()[0];
+                    if (foc.currentItemIndex +1 >= parent.children.length) {
+                        //_("Is a task end")
+                        foc.currentItemIndex = 0;
+                        moveDown = true;
+                    } else {
+                        //_("task increamented")
+                        foc.currentItemIndex++;
+                    }
+                } else {
+                    //_("Is a host")
+                    moveDown = true;
+                }
+            } else {
+                //_("Is null")
+                moveDown = true;
+            }
+            if (moveDown) {
+                //_("moving down");
+                if (foc.currentRowIndex+1 >= maxrow) {
+                    foc.currentItemIndex = 0;
+                    foc.currentRowIndex = 1;
+                } else {
+                    foc.currentItemIndex = 0;
+                    foc.currentRowIndex = foc.currentRowIndex + 2;
+                }
+            }            
+        }
+
+        foc.showFocus();
+        //_([foc.currentRowIndex, foc.currentColIndex]);
+        return false;
+    }
+    return true;
+}
+
+FocusHelper.prototype.showFocus = function () {
+    //_([foc.currentRowIndex, foc.currentItemIndex]);
+    $("." + FocusHelper.classFocused).removeClass(FocusHelper.classFocused);
+    //$("#divBoard tbody tr td").removeClass("selected");
+    cell = $("#divBoard tbody tr")[foc.currentRowIndex].children[foc.currentColIndex];
+    taskContainer = cell.children[0];
+    if (taskContainer.children.length > 0) {
+        foc.currentItem = taskContainer.children[foc.currentItemIndex]
+        $(foc.currentItem).addClass(FocusHelper.classFocused);
+    }
+    else {
+        foc.currentItem = taskContainer;
+        $(taskContainer).addClass(FocusHelper.classFocused);
+    }
+
+}
+
+function KanbanBoard() {
+    this.keyboard = new FocusHelper(this);
+}
+
+KanbanBoard.prototype.init = function (){
+
+    kbSelf = this;
     var seq = new Sequencer($kb);
 
     seq.queueFunc(this.loadUITemplates, null);
     seq.queueFunc(this.getProjectStatuses, null);
     seq.queueFunc(this.getProjectUsers, null);
     seq.queueFunc(this.getProjectItems, null);
-    
-
-    seq.queueFunc(function (callback, args) {
-
-        board = $("#divBoard");
-
-        boardTable = $("<table id='tblBoard' class='kbBoardTable' cellspacing='0' cellpadding='0'></table>");
-        board.append(boardTable);
-
-        colors = new ColorWheel();
-        thead = $("<thead></thead>");
-
-        boardTable.append(thead);
-        tr = $("<tr id='row_master'></tr>");
-        //colors.nextColor('bg');
-        //tr.append("<td class='" + colors.nextColor('bg') + "-vlight'></td>");
-        tr.append("<td class='kbUser'></td>");        
-        //console.log(kbSelf);
-        for (j = 0; j < kbSelf.projectStatuses.length; j++) {
-            projStatus = kbSelf.projectStatuses[j];
-            td = $("<th id='cell_master_status_" + projStatus.ProjectStatusID.toString() +
-                "' class='" + colors.nextColor('bg') + "-light kbTaskHeader' style='width:150px' >" + projStatus.Name + "</th>")
-            tr.append(td);
-        }
-        thead.append(tr);
-
-        tbody = $("<tbody id='tbBoard'></tbody>");
-        
-        for (i = 0; i < kbSelf.projectUsers.length; i++) {
-            user = kbSelf.projectUsers[i];
-            tr = $("<tr id='row_user_" + user.UserID.toString() + "'></tr>");            
-            trIndicator = $("<tr id='row_indicator_user_" + user.UserID.toString() + "'></tr>");
-            colors.reset();
-            //colors.nextColor('bg');
-
-            tr.append("<td id='cell_user_master_" + user.UserID.toString() +
-                "' class='kbUser'>" + user.Name + "</td>");
-            trIndicator.append("<td id='cell_user_master_" + user.UserID.toString() +
-                "' class='kbUser'  ></td>");
-
-            for (j = 0; j < kbSelf.projectStatuses.length; j++) {
-                //console.log(kbSelf);
-                projStatus = kbSelf.projectStatuses[j];
-                td = $("<td id='cell_user_" + user.UserID.toString() +
-                    "_status_" + projStatus.ProjectStatusID.toString() +
-                    "' ></td>")
-                
-                colorClass = colors.nextColor('bg');
-                td[0].colorClass = colorClass;
-                tdIndicator = $("<td id='cell_indicator_user_" + user.UserID.toString() +
-                    "_status_" + projStatus.ProjectStatusID.toString() +
-                    "' class='" + colorClass + "-vlight kbTaskIndicator'></td>")
-                container = new TaskContainer(user, projStatus, td[0]);
-                tr.append(td);
-                trIndicator.append(tdIndicator);
-            }
-            tbody.append(trIndicator);
-            tbody.append(tr);
-        }
-        boardTable.append(tbody);
-        //$kb.showNewTask();
-
-        if (callback != undefined && callback != null) {
-            callback.onExecutionComplete(callback);
-        }
-    });
-    
+    seq.queueFunc(this.showBoard, null);
     seq.queueFunc(this.loadProjectItems, null);
 
     seq.execute();
+
+}
+
+
+KanbanBoard.prototype.showBoard = function (callback, args) {
+    
+    kbSelf = this.state;
+
+    board = $("#divBoard");
+
+    boardTable = $("<table id='tblBoard' class='kbBoardTable' cellspacing='0' cellpadding='0'></table>");
+    board.append(boardTable);
+
+    colors = new ColorWheel();
+    thead = $("<thead></thead>");
+
+    boardTable.append(thead);
+    tr = $("<tr id='row_master'></tr>");
+    //colors.nextColor('bg');
+    //tr.append("<td class='" + colors.nextColor('bg') + "-vlight'></td>");
+    tr.append("<td class='kbUser'></td>");        
+    //console.log(kbSelf);
+    for (j = 0; j < kbSelf.projectStatuses.length; j++) {
+        projStatus = kbSelf.projectStatuses[j];
+        td = $("<th id='cell_master_status_" + projStatus.ProjectStatusID.toString() +
+            "' class='" + colors.nextColor('bg') + "-light kbTaskHeader' style='width:150px' >" + projStatus.Name + "</th>")
+        tr.append(td);
+    }
+    thead.append(tr);
+
+    tbody = $("<tbody id='tbBoard'></tbody>");
+        
+    for (i = 0; i < kbSelf.projectUsers.length; i++) {
+        user = kbSelf.projectUsers[i];
+        tr = $("<tr id='row_user_" + user.UserID.toString() + "'></tr>");            
+        trIndicator = $("<tr id='row_indicator_user_" + user.UserID.toString() + "'></tr>");
+        colors.reset();
+        //colors.nextColor('bg');
+
+        tr.append("<td id='cell_user_master_" + user.UserID.toString() +
+            "' class='kbUser'>" + user.Name + "</td>");
+        trIndicator.append("<td id='cell_user_master_" + user.UserID.toString() +
+            "' class='kbUser'  ></td>");
+
+        for (j = 0; j < kbSelf.projectStatuses.length; j++) {
+            //console.log(kbSelf);
+            projStatus = kbSelf.projectStatuses[j];
+            td = $("<td id='cell_user_" + user.UserID.toString() +
+                "_status_" + projStatus.ProjectStatusID.toString() +
+                "' ></td>")
+
+            td.attr("row", ((i*2) +1).toString());
+            td.attr("col", (j+1).toString());
+
+                
+            colorClass = colors.nextColor('bg');
+            td[0].colorClass = colorClass;
+            tdIndicator = $("<td id='cell_indicator_user_" + user.UserID.toString() +
+                "_status_" + projStatus.ProjectStatusID.toString() +
+                "' class='" + colorClass + "-vlight kbTaskIndicator'></td>")
+            container = new TaskContainer(user, projStatus, td[0]);
+            tr.append(td);
+            trIndicator.append(tdIndicator);
+        }
+        tbody.append(trIndicator);
+        tbody.append(tr);
+    }
+    boardTable.append(tbody);
+    //$kb.showNewTask();
+
+    if (callback != undefined && callback != null) {
+        callback.onExecutionComplete(callback);
+    }    
 }
 
 KanbanBoard.prototype.loadUITemplates= function (callback, args) {
@@ -239,6 +419,19 @@ KanbanBoard.prototype.getProjectStatuses = function (callback, args) {
     });
 }
 
+KanbanBoard.prototype.newTask = function (userID, statusID) {
+    task = {
+        'TaskID': null,
+        'UserID': userID,
+        'StatusID': statusID,
+        'Title': '(New Task)',
+        'Descriptions': '',
+        'ProjectID': parseInt($projectID), // todo
+        'TFSTaskID': 0
+    };
+    kbSelf.showTask(task);
+}
+
 KanbanBoard.prototype.showTask = function (task) {
     kbSelf = this;
 
@@ -261,31 +454,55 @@ KanbanBoard.prototype.showTask = function (task) {
     } catch (e) { }
     if (taskitem != null) {
         saveFunc = function () {
-            console.log ("trying to save");
             taskitem = $("#divTask" + task.TaskID.toString())[0].task
             taskitem.save();
-            taskitem.refresh();
+            //taskitem.refresh();
+            taskitem.recreate();
         }
     }
 
-    handle = kbSelf.showScreen('task_new', saveFunc);
+    kbSelf.keyboard.mode = FocusHelper.MODE_TASK_EDIT;
 
-    // load the lists
+    listData = { 'UserID': [], 'StatusID': [] }
     $.each($kb.projectUsers, function (index, user) {
-        $("#tskUserID").append("<option value=" + user.UserID.toString() + ">" + user.Email + "</option>");
+        listData.UserID.push({
+            text: user.Name,
+            value: user.UserID.toString(),
+            selected: false,
+            description: user.Email,
+            imageSrc: null
+        });
     });
 
     $.each($kb.projectStatuses, function (index, stat) {
-        $("#tskStatusID").append("<option value=" + stat.ProjectStatusID.toString() + ">" + stat.Name + "</option>");
+        listData.StatusID.push({
+            text: stat.Name,
+            value: stat.ProjectStatusID.toString(),
+            selected: false,
+            description: "",
+            imageSrc: null
+        });
     });
 
+    handle = kbSelf.showScreen('task_entry', listData, saveFunc);
+
+
+
     kbSelf.objectToScreen(handle, task);
+
+
 }
 
 KanbanBoard.prototype.objectToScreen = function (screenId, object){
     $.each(object, function (name, value) {
         find = "#" + screenId + " " + "[field='" + name + "']";
-        $(find).val(value);
+        found = $(find);
+        if (found.hasClass("dd-container")) {
+            //found.data().selectedData.value
+        }
+        else {
+            found.val(value);
+        }
     });
     $("#" + screenId)[0].object = object;
 }
@@ -294,15 +511,21 @@ KanbanBoard.prototype.screenToObject = function (screenId) {
     object = $("#" + screenId)[0].object;
     $.each(object, function (name, value) {
         find = "#" + screenId + " " + "[field='" + name + "']";
-        if ($(find).length>0) {
-            object[name] = $(find).val();
+        found = $(find);
+        if (found.length > 0) {
+            if (found.hasClass("dd-container")) {
+                object[name] = found.data().ddslick.selectedData.value;
+            }
+            else {
+                object[name] = found.val();
+            }
         }
     });
 }
 
 screenCount = 0;
 
-KanbanBoard.prototype.showScreen = function (templateName, updateObject) {
+KanbanBoard.prototype.showScreen = function (templateName, selectLists, updateObject) {
     kbSelf = this;
     
     // Make the trasparent div 
@@ -323,14 +546,33 @@ KanbanBoard.prototype.showScreen = function (templateName, updateObject) {
     divScreen.append($(kbSelf.templates[templateName]));
     screenRoot = divScreen.children("");
     scrLeft = ((viewportWidth - screenRoot.width()) / 2).toString();
-    scrTop = ((viewportHeight - screenRoot.height()) / 2).toString();
-
+    scrTop = 20; //((viewportHeight - screenRoot.height()) / 2).toString();
     // Now move our 
     divScreen.css('left', scrLeft + "px");
     divScreen.css('top', scrTop + "px");
-    
+        
     //divScreen.css("width", screenRoot.width().toString() + "px");
-    $(".screenhost").show("slide", { direction: "right" }, 500);
+    //$(".screenhost").show("fadeIn", { direction: "right" }, 500);
+    $(".screenhost").show();
+
+    $.each(selectLists, function (key, value) {
+        find = "#" + newID + " " + "[field='" + key + "']";
+        found = $(find);
+        //_(value);
+        /*
+        found.ddslick({
+            data:value,
+            width: '100%',
+            onSelected: function (selectedData){}, 
+            enableKeyboard: true,
+            keyboard: [{ 'up': 38, 'down': 40, 'select': 32 }]}); 
+            */
+        $.each(value, function (index, data) {
+            found.append("<option value='" + data.value + "'>" + data.text + "</option>");
+        });        
+    });
+    //slickSelect();
+    //setTimeout("slickSelect()", 1000);
 
     funcExecute = function (e) {        
         kbSelf.screenToObject(newID);
@@ -338,12 +580,17 @@ KanbanBoard.prototype.showScreen = function (templateName, updateObject) {
         kbSelf.destroyScreen(newID);
         blockUI.remove();
         document.clearAction();
+        // TODO
+        kbSelf.keyboard.mode = FocusHelper.MODE_TASK_BROWSE;
+        kbSelf.keyboard.showFocus();
     }
 
     funcCancel = function (e) {
         kbSelf.destroyScreen(newID);
         blockUI.remove();
         document.clearAction();
+        kbSelf.keyboard.mode = FocusHelper.MODE_TASK_BROWSE;
+        kbSelf.keyboard.showFocus();
     }
 
     document.setAction(funcExecute, funcCancel);
@@ -500,9 +747,17 @@ function TaskItem(boardItem) {
 
     TaskItem.prototype.refresh = function(){
         tiSelf = this;
-        console.log("tiSelf.item.Title");
         htmlTaskId = tiSelf.item.TaskID.toString();        
         span = $("span#taskLabel" + htmlTaskId).text(tiSelf.item.Title);
+    }
+
+    TaskItem.prototype.recreate = function () {
+        tiSelf.parent.tasks[tiSelf.ui.id] = null;
+        $(tiSelf.ui).remove();
+        divHostId = "#div_user_" + tiSelf.item.UserID.toString() + "_status_" + tiSelf.item.StatusID.toString();
+        taskContainer = $(divHostId)[0].taskContainer;
+        tiSelf.createUI(taskContainer);
+        taskContainer.tasks[ti.ui.id] = ti;
     }
 
     TaskItem.prototype.save = function () {

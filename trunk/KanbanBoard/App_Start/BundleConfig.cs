@@ -17,6 +17,7 @@ namespace KanbanBoard
             "~/Scripts/knockout-2.1.0.js").Include(
             "~/Scripts/dropdown.js").Include(
             "~/Scripts/pagecontrol.js").Include(
+            "~/Scripts/ddslick.js").Include(
             "~/Scripts/kboard.js"));
 
 
