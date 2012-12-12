@@ -15,11 +15,11 @@ namespace KanbanBoard.Controllers
             return View();
         }
 
-        public ActionResult Board()
+        public ActionResult Board(int id)
         {
             ViewBag.Message = "Welcome";
-
-            return View();
+            ViewBag.ProjectID = id;
+            return View(); 
         }
 
         public ActionResult Contact()

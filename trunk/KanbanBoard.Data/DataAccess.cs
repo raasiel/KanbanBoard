@@ -177,25 +177,42 @@ namespace KanbanBoard.Data
 
         }
 
-        public bool UpdateTask(Task task)
+        public Task UpdateTask(Task task)
         {
+            Task ret = null;
             KanbanBoard.Data.KanbanTFSEntities kt = new KanbanTFSEntities();
-
+            bool taskFound = false;
             var result = from tsk in kt.Tasks
                          where tsk.TaskID == task.TaskID
                          select tsk;
             foreach (var tsk in result)
             {
+                taskFound = true;
                 tsk.ProjectID = task.ProjectID;
                 tsk.TFSTaskID = task.TFSTaskID;
                 tsk.Title = task.Title;
                 tsk.Descriptions = task.Descriptions;
                 tsk.UserID = task.UserID;
-                tsk.StatusID = task.StatusID;                                
+                tsk.StatusID = task.StatusID;
+                ret = tsk;
             }
+            if (taskFound == false)
+            {
+                ret = task;
+                kt.Tasks.Add(task);
+            }
+            kt.SaveChanges();
+            return ret;
+        }
+
+        public bool Delete(Task task)
+        {
+            KanbanBoard.Data.KanbanTFSEntities kt = new KanbanTFSEntities();
+            Task t = new Task() { TaskID = task.TaskID };
+            kt.Tasks.Attach(t);
+            kt.Tasks.Remove(t);
             kt.SaveChanges();
             return true;
         }
-
     }
 }

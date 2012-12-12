@@ -1,5 +1,5 @@
-﻿$projectID = "2";
-selectedTaskIndex = -1;
+﻿$projectID = 2;
+if ($projectID == null) { $projectID = "2"; }
 
 function _(text) {
     console.log(text);
@@ -51,7 +51,6 @@ function FocusHelper(kanbanBoard) {
 }
 
 FocusHelper.classFocused = "selected";
-FocusHelper.classSelected = "selected";
 FocusHelper.MODE_TASK_BROWSE = "task_browse";
 FocusHelper.MODE_TASK_EDIT = "task_edit";
 
@@ -74,7 +73,7 @@ FocusHelper.prototype.onClickHandler = function (e) {
         foc.currentColIndex = parseInt(parent.attr("col"));
 
         for (i = 0; i < elmCheck.parentElement.childNodes.length; i++) {
-            if ($(elmCheck.parentElement.childNodes[i]).is(elmCheck)) {
+            if (elmCheck.parentElement.childNodes[i].id == elmCheck.id) {
                 foc.currentItemIndex = i;
                 break;
             }
@@ -131,12 +130,45 @@ FocusHelper.prototype.keyboardHandler = function (e) {
         return false;
     }*/
  
+    
     keycode = e.which;
     if (keycode == 45 && foc.mode == FocusHelper.MODE_TASK_BROWSE) {
-        if ($(foc.currentItem).hasClass("kbTaskHost")){
-            foc.board.newTask(foc.currentItem.userID, foc.currentItem.statusID);
+        tcContainer = null;
+        
+        if ($(foc.currentItem).hasClass("kbTaskHost")) {
+            tcContainer = foc.currentItem.taskContainer;
+        } else if ($(foc.currentItem).hasClass("kbTask")) {            
+            tcContainer = foc.currentItem.task.parent;
+            foc.currentItem = tcContainer.ui;
+        }
+        _(tcContainer);
+        foc.board.newTask(tcContainer.user.UserID, tcContainer.status.ProjectStatusID);
+    }
+
+    if (keycode == 46 && foc.mode == FocusHelper.MODE_TASK_BROWSE) {
+        if ($(foc.currentItem).hasClass("kbTask")) {
+            response = confirm("Are you sure you want to delete this task?");
+            if (response == true) {
+                $.ajax(
+                {
+                    type: "POST",
+                    url: "/api/board/deletetask",
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    data: JSON.stringify(foc.currentItem.task.item),
+                    success: function (data) {
+                        foc.currentItem.task.parent.tasks[foc.currentItem.task.ui.id] = null;
+                        $(foc.currentItem.task.ui).remove();
+
+                    },
+                    error: function (request, status, error) {
+                        alert("Could not delete task.");
+                    }
+                });
+            }
         }
     }
+
 
     if (keycode >= 37 && keycode <= 40 && foc.mode == FocusHelper.MODE_TASK_BROWSE) {
 
@@ -247,7 +279,12 @@ FocusHelper.prototype.showFocus = function () {
         foc.currentItem = taskContainer;
         $(taskContainer).addClass(FocusHelper.classFocused);
     }
+}
 
+FocusHelper.prototype.getCurrentTaskContainer = function () {
+    cell = $("#divBoard tbody tr")[foc.currentRowIndex].children[foc.currentColIndex];
+    taskContainer = cell.children[0].taskContainer;
+    return taskContainer;
 }
 
 function KanbanBoard() {
@@ -421,7 +458,7 @@ KanbanBoard.prototype.getProjectStatuses = function (callback, args) {
 
 KanbanBoard.prototype.newTask = function (userID, statusID) {
     task = {
-        'TaskID': null,
+        'TaskID': 99999,
         'UserID': userID,
         'StatusID': statusID,
         'Title': '(New Task)',
@@ -437,7 +474,7 @@ KanbanBoard.prototype.showTask = function (task) {
 
     if (task == null) {
         task = {
-            'TaskID': null,
+            'TaskID': 99999,
             'UserID': null,
             'StatusID': null,
             'Title': '(New Task)',
@@ -452,14 +489,25 @@ KanbanBoard.prototype.showTask = function (task) {
     try{
         taskitem = $("#divTask" + task.TaskID.toString())[0].task
     } catch (e) { }
-    if (taskitem != null) {
-        saveFunc = function () {
+    
+    saveFunc = function (updatedObject) {
+        if (taskitem != null) {
             taskitem = $("#divTask" + task.TaskID.toString())[0].task
             taskitem.save();
             //taskitem.refresh();
             taskitem.recreate();
+        } 
+        else {
+            // Where to insert the new task 
+            
+            boardItem = kbSelf.boardItemFromTask(updatedObject);
+            //_(["new task save", boardItem]);
+            taskContainer = kbSelf.keyboard.getCurrentTaskContainer();
+            taskitem = taskContainer.createTask(boarditem);
+            taskitem.save();
+            taskitem.recreate();
         }
-    }
+    } 
 
     kbSelf.keyboard.mode = FocusHelper.MODE_TASK_EDIT;
 
@@ -486,14 +534,28 @@ KanbanBoard.prototype.showTask = function (task) {
 
     handle = kbSelf.showScreen('task_entry', listData, saveFunc);
 
-
-
     kbSelf.objectToScreen(handle, task);
+}
+
+KanbanBoard.prototype.boardItemFromTask = function (task, userid, statusid) {
+    
+    boarditem = {
+        'TaskID': task.TaskID,
+        'UserID': task.UserID,
+        'StatusID': task.StatusID,
+        'Title': task.Title,
+        'Descriptions': task.Descriptions,
+        'ProjectID': task.ProjectID,
+        'TFSTaskID': task.TFSTaskID
+    };
+    
+    return boarditem;
 
 
 }
 
-KanbanBoard.prototype.objectToScreen = function (screenId, object){
+KanbanBoard.prototype.objectToScreen = function (screenId, object) {
+    //_(["object to screen" , object] )
     $.each(object, function (name, value) {
         find = "#" + screenId + " " + "[field='" + name + "']";
         found = $(find);
@@ -508,11 +570,15 @@ KanbanBoard.prototype.objectToScreen = function (screenId, object){
 }
 
 KanbanBoard.prototype.screenToObject = function (screenId) {
+    
     object = $("#" + screenId)[0].object;
+    //_(["Screen to object", object]);
     $.each(object, function (name, value) {
         find = "#" + screenId + " " + "[field='" + name + "']";
         found = $(find);
+        //_(find, found);
         if (found.length > 0) {
+            $(found);
             if (found.hasClass("dd-container")) {
                 object[name] = found.data().ddslick.selectedData.value;
             }
@@ -521,6 +587,8 @@ KanbanBoard.prototype.screenToObject = function (screenId) {
             }
         }
     });
+    //_(["Screen to object update", object]);
+    return object;
 }
 
 screenCount = 0;
@@ -574,15 +642,17 @@ KanbanBoard.prototype.showScreen = function (templateName, selectLists, updateOb
     //slickSelect();
     //setTimeout("slickSelect()", 1000);
 
-    funcExecute = function (e) {        
-        kbSelf.screenToObject(newID);
-        updateObject();
-        kbSelf.destroyScreen(newID);
-        blockUI.remove();
-        document.clearAction();
-        // TODO
-        kbSelf.keyboard.mode = FocusHelper.MODE_TASK_BROWSE;
-        kbSelf.keyboard.showFocus();
+    funcExecute = function (e) {
+        try {
+            updatedObj = kbSelf.screenToObject(newID);
+            updateObject(updatedObj);
+            kbSelf.destroyScreen(newID);
+            blockUI.remove();
+            document.clearAction();
+            // TODO
+            kbSelf.keyboard.mode = FocusHelper.MODE_TASK_BROWSE;
+            kbSelf.keyboard.showFocus();
+        } catch (e) { _(e)}
     }
 
     funcCancel = function (e) {
@@ -695,11 +765,11 @@ function TaskContainer(user, status, parentElement) {
         
         ti.createUI(tcSelf);
         tcSelf.tasks[ti.ui.id] = ti;
+        return ti;
     }
 
     TaskContainer.prototype.takeOwnership = function (taskItem) {
     }
-
 }
 
 function TaskItem(boardItem) {
@@ -773,6 +843,8 @@ function TaskItem(boardItem) {
             'TFSTaskID': 0
         };
 
+        //_(tiSelf.item);
+
         $.ajax(
         {
             type: "POST",
@@ -781,6 +853,7 @@ function TaskItem(boardItem) {
             dataType: "json",
             data: JSON.stringify(task),
             success: function (data) {
+                tiSelf.item.TaskID = data.TaskID;
             },
             error: function (request, status, error) {
                 alert("Could not save task status.");

@@ -25,10 +25,19 @@ namespace KanbanBoard.Controllers
         }
 
         [HttpPost]
-        public bool UpdateTask(Task task)
+        public Task UpdateTask(Task task)
         {
             DataAccess da = new DataAccess();
-            return da.UpdateTask(task);
+            return da.UpdateTask(task);            
         }
+
+        [HttpPost]
+        public bool DeleteTask(Task task)
+        {
+            DataAccess da = new DataAccess();
+            return da.Delete(task);
+        }
+
+ 
     }
 }
