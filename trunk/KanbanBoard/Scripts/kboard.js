@@ -159,7 +159,7 @@ FocusHelper.prototype.keyboardHandler = function (e) {
                     success: function (data) {
                         foc.currentItem.task.parent.tasks[foc.currentItem.task.ui.id] = null;
                         $(foc.currentItem.task.ui).remove();
-
+                        foc.showFocus();
                     },
                     error: function (request, status, error) {
                         alert("Could not delete task.");
@@ -266,9 +266,7 @@ FocusHelper.prototype.keyboardHandler = function (e) {
 }
 
 FocusHelper.prototype.showFocus = function () {
-    //_([foc.currentRowIndex, foc.currentItemIndex]);
     $("." + FocusHelper.classFocused).removeClass(FocusHelper.classFocused);
-    //$("#divBoard tbody tr td").removeClass("selected");
     cell = $("#divBoard tbody tr")[foc.currentRowIndex].children[foc.currentColIndex];
     taskContainer = cell.children[0];
     if (taskContainer.children.length > 0) {
@@ -493,19 +491,21 @@ KanbanBoard.prototype.showTask = function (task) {
     saveFunc = function (updatedObject) {
         if (taskitem != null) {
             taskitem = $("#divTask" + task.TaskID.toString())[0].task
-            taskitem.save();
-            //taskitem.refresh();
-            taskitem.recreate();
+            taskitem.save(function () {
+                taskitem.recreate();
+                kbSelf.keyboard.showFocus();
+            });
         } 
         else {
             // Where to insert the new task 
             
             boardItem = kbSelf.boardItemFromTask(updatedObject);
-            //_(["new task save", boardItem]);
             taskContainer = kbSelf.keyboard.getCurrentTaskContainer();
             taskitem = taskContainer.createTask(boarditem);
-            taskitem.save();
-            taskitem.recreate();
+            taskitem.save(function () {
+                taskitem.recreate();
+                kbSelf.keyboard.showFocus();
+            });
         }
     } 
 
@@ -830,7 +830,7 @@ function TaskItem(boardItem) {
         taskContainer.tasks[ti.ui.id] = ti;
     }
 
-    TaskItem.prototype.save = function () {
+    TaskItem.prototype.save = function (afterSave) {
         tiSelf = this;
 
         task = {
@@ -843,8 +843,6 @@ function TaskItem(boardItem) {
             'TFSTaskID': 0
         };
 
-        //_(tiSelf.item);
-
         $.ajax(
         {
             type: "POST",
@@ -854,7 +852,10 @@ function TaskItem(boardItem) {
             data: JSON.stringify(task),
             success: function (data) {
                 tiSelf.item.TaskID = data.TaskID;
-            },
+                if (afterSave) {
+                    afterSave();
+                }
+            },  
             error: function (request, status, error) {
                 alert("Could not save task status.");
             }
