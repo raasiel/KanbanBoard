@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>{% block title %}Kanban TFS{% endblock %}</title>
+    <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+    <meta name="viewport" content="width=device-width" />
+    <!--@Styles.Render("~/Content/css")-->
+    {% block head %}
+    <link rel="stylesheet" href="/public/stylesheets/style.css">
+    <link rel="stylesheet" href="/public/stylesheets/metro-ui-light.css">
+    {% endblock %}
+
+    <!--@Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/jqueryui")
+    @Scripts.Render("~/bundles/kboard")-->
+</head>
+<body>
+<header>
+</header>
+<div id="body">
+    <section class="main-content clear-fix">
+        {% block content %}{% endblock %}
+    </section>
+</div>
+<footer>
+    <section class="main-content clear-fix">
+        {% block footer %}{% endblock %}
+    </section>
+</footer>
+{% block scripts %}
+<script language="JavaScript" src="/public/javascripts/jquery-2.1.1.min.js" />
+<script language="JavaScript" src="/public/javascripts/jquery-ui-1.10.4.min.js" />
+<script language="JavaScript" src="/public/javascripts/jquery.unobtrusive-ajax.min.js" />
+<script language="JavaScript" src="/public/javascripts/jquery.validate.min.js" />
+<script language="JavaScript" src="/public/javascripts/modernizr-2.7.2.js" />
+<script language="JavaScript" src="/public/javascripts/dropdown.js" />
+<script language="JavaScript" src="/public/javascripts/pagecontrol.js" />
+<script language="JavaScript" src="/public/javascripts/ddslick.js" />
+<script language="JavaScript" src="/public/javascripts/kboard.js" />
+{% endblock %}
+</body>
+</html>

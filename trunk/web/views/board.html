@@ -1,0 +1,47 @@
+{% extends 'layout.html' %}
+
+{% block title %}Home Page - Kanban TFS{% endblock %}
+
+{% block head %}
+{% parent %}
+<link rel="stylesheet" href="custom.css">
+<link href='http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
+{% endblock %}
+
+{% block content %}
+<script>
+    $projectID = @ViewBag.ProjectID
+</script>
+<div class="navigation-bar">
+    <div class="navigation-bar-inner">
+        <div class="brand">
+            <span class="name">Project Board</span>
+        </div>
+        <ul class="place-right">
+            <li>
+                <a href="javascript:$kb.showTask(); ">+ Add Task</a>
+            </li>
+        </ul>
+    </div>
+</div>
+<article>
+    <div id="divBoard"></div>
+</article>
+<script>
+    $kb = null;
+    $(document).ready(function () {
+        $("body").css("-webkit-user-select", "none");
+        $("body").css("-moz-user-select", "none");
+        $("body").css("-ms-user-select", "none");
+        $("body").css("-o-user-select", "none");
+        $("body").css("user-select", "none");
+        $kb = new KanbanBoard();
+        $kb.init();
+        //window.setTime    out("$kb.showNewTask();", 1000);
+    });
+</script>
+{% endblock %}
+
+
+
+
