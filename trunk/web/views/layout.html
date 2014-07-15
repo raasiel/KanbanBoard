@@ -11,6 +11,19 @@
     <link rel="stylesheet" href="/public/stylesheets/metro-ui-light.css">
     {% endblock %}
 
+    {% block scripts %}
+    <script language="JavaScript" src="/public/javascripts/jquery-2.1.1.min.js"></script>
+    <script language="JavaScript" src="/public/javascripts/jquery-ui-1.10.4.min.js"></script>
+    <script language="JavaScript" src="/public/javascripts/jquery.unobtrusive-ajax.min.js"></script>
+    <script language="JavaScript" src="/public/javascripts/jquery.validate.min.js"></script>
+    <script language="JavaScript" src="/public/javascripts/modernizr-2.7.2.js"></script>
+    <script language="JavaScript" src="/public/javascripts/dropdown.js"></script>
+    <script language="JavaScript" src="/public/javascripts/pagecontrol.js"></script>
+    <script language="JavaScript" src="/public/javascripts/ddslick.js"></script>
+    <script language="JavaScript" src="/public/javascripts/mousetrap.js"></script>
+    <script language="JavaScript" src="/public/javascripts/kboard.js"></script>
+    {% endblock %}
+
     <!--@Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/jqueryui")
     @Scripts.Render("~/bundles/kboard")-->
@@ -28,16 +41,6 @@
         {% block footer %}{% endblock %}
     </section>
 </footer>
-{% block scripts %}
-<script language="JavaScript" src="/public/javascripts/jquery-2.1.1.min.js" />
-<script language="JavaScript" src="/public/javascripts/jquery-ui-1.10.4.min.js" />
-<script language="JavaScript" src="/public/javascripts/jquery.unobtrusive-ajax.min.js" />
-<script language="JavaScript" src="/public/javascripts/jquery.validate.min.js" />
-<script language="JavaScript" src="/public/javascripts/modernizr-2.7.2.js" />
-<script language="JavaScript" src="/public/javascripts/dropdown.js" />
-<script language="JavaScript" src="/public/javascripts/pagecontrol.js" />
-<script language="JavaScript" src="/public/javascripts/ddslick.js" />
-<script language="JavaScript" src="/public/javascripts/kboard.js" />
-{% endblock %}
+
 </body>
 </html>

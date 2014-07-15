@@ -31,6 +31,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view cache', false);
 swig.setDefaults({ cache: false });
 
+
 app.use(favicon());
 app.use(logger('dev'));
 app.use(bodyParser.json());
@@ -49,10 +50,59 @@ app.use(function(req, res, next) {
 app.use("/public", express.static(path.join(__dirname, 'public')));
 app.use('/', routes);
 app.use("/api",api);
-//app.use('/users', users);
+
+var passport = require('passport');
+var LocalStrategy = require('passport-local').Strategy;
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+// TODO: Move into a different router
+
+app.post('/login',
+    passport.authenticate('local', {
+        successRedirect: '/loginSuccess',
+        failureRedirect: '/loginFailure'
+    })
+);
 
 
+app.get('/loginFailure', function (req, res, next) {
+    res.send('Failed to authenticate');
+});
 
+app.get('/loginSuccess', function (req, res, next) {
+    console.log(req);
+    res.send('Successfully authenticated - ' + JSON.stringify(req.passport));
+});
+
+passport.serializeUser(function (user, done) {
+    console.log("serializeUser")
+    done(null, user);
+});
+
+passport.deserializeUser(function (user, done) {
+    console.log("deserializeUser")
+    done(null, user);
+});
+
+passport.use(new LocalStrategy(
+    function (username, password, done) {
+        return done(null, {username: username});
+        User.findOne({ username: username }, function (err, user) {
+            if (err) {
+                return done(err);
+            }
+            if (!user) {
+                return done(null, false, { message: 'Incorrect username.' });
+            }
+            if (!user.validPassword(password)) {
+                return done(null, false, { message: 'Incorrect password.' });
+            }
+            return done(null, {username: username});
+        });
+    }
+));
 
 /// catch 404 and forward to error handler
 app.use(function(req, res, next) {

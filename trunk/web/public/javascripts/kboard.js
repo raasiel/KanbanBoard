@@ -1,5 +1,7 @@
-﻿$projectID = 2;
-if ($projectID == null) { $projectID = "2"; }
+﻿$projectID = "53ae842c3ab18ca098622cfe";
+if ($projectID == null) {
+    $projectID = "53ae842c3ab18ca098622cfe";
+}
 
 function _(text) {
     console.log(text);
@@ -35,6 +37,7 @@ function FocusHelper(kanbanBoard) {
     foc = this;
     foc.board = kanbanBoard;
 
+
     // set up the keyboard handler
     document.clearAction = function () {
         document.actionExecute = null;
@@ -46,8 +49,8 @@ function FocusHelper(kanbanBoard) {
         document.actionCancel = cancel;
     }
 
-    $(document).live("keydown", foc.keyboardHandler);
-    $(".kbTaskHost,.kbTask").live("click", foc.onClickHandler);
+    $(document).on("keydown", foc.keyboardHandler);
+    $(".kbTaskHost,.kbTask").on("click", foc.onClickHandler);
 }
 
 FocusHelper.classFocused = "selected";
@@ -90,7 +93,13 @@ FocusHelper.prototype.onClickHandler = function (e) {
     return false;
 }
 
-
+FocusHelper.prototype.kbHandle = function () {
+    Mousetrap.bindGlobal("ctrl+k", function (e) {
+        foc.keyboardHandler(e);
+        $kb.showTask();
+        return false;
+    })
+}
 
 FocusHelper.prototype.keyboardHandler = function (e) {
 
@@ -114,23 +123,8 @@ FocusHelper.prototype.keyboardHandler = function (e) {
             document.actionCancel();
         }
     }
-        /*
-    else if (e.which == 9) {
-        taskdivs = $(".kbTask");
-        if (selectedTaskIndex != -1) {
-            $(taskdivs[selectedTaskIndex]).toggleClass("selected");
-        }
-        if (e.shiftKey == false) {
-            selectedTaskIndex++;
-        }
-        else {
-            selectedTaskIndex--;
-        }
-        $(taskdivs[selectedTaskIndex]).toggleClass("selected");
-        return false;
-    }*/
- 
-    
+
+
     keycode = e.which;
     if (keycode == 45 && foc.mode == FocusHelper.MODE_TASK_BROWSE) {
         tcContainer = null;
@@ -142,7 +136,7 @@ FocusHelper.prototype.keyboardHandler = function (e) {
             foc.currentItem = tcContainer.ui;
         }
         _(tcContainer);
-        foc.board.newTask(tcContainer.user.UserID, tcContainer.status.ProjectStatusID);
+        foc.board.newTask(tcContainer.user._id.toString(), tcContainer.status._id);
     }
 
     if (keycode == 46 && foc.mode == FocusHelper.MODE_TASK_BROWSE) {
@@ -287,6 +281,7 @@ FocusHelper.prototype.getCurrentTaskContainer = function () {
 
 function KanbanBoard() {
     this.keyboard = new FocusHelper(this);
+    this.keyboard.kbHandle();
 }
 
 KanbanBoard.prototype.init = function (){
@@ -326,8 +321,8 @@ KanbanBoard.prototype.showBoard = function (callback, args) {
     //console.log(kbSelf);
     for (j = 0; j < kbSelf.projectStatuses.length; j++) {
         projStatus = kbSelf.projectStatuses[j];
-        td = $("<th id='cell_master_status_" + projStatus.ProjectStatusID.toString() +
-            "' class='" + colors.nextColor('bg') + "-light kbTaskHeader' style='width:150px' >" + projStatus.Name + "</th>")
+        td = $("<th id='cell_master_status_" + projStatus._id.toString() +
+            "' class='" + colors.nextColor('bg') + "-light kbTaskHeader' style='width:150px' >" + projStatus.name + "</th>")
         tr.append(td);
     }
     thead.append(tr);
@@ -336,31 +331,30 @@ KanbanBoard.prototype.showBoard = function (callback, args) {
         
     for (i = 0; i < kbSelf.projectUsers.length; i++) {
         user = kbSelf.projectUsers[i];
-        tr = $("<tr id='row_user_" + user.UserID.toString() + "'></tr>");            
-        trIndicator = $("<tr id='row_indicator_user_" + user.UserID.toString() + "'></tr>");
+        tr = $("<tr id='row_user_" + user._id.toString() + "'></tr>");
+        trIndicator = $("<tr id='row_indicator_user_" + user._id.toString() + "'></tr>");
         colors.reset();
         //colors.nextColor('bg');
 
-        tr.append("<td id='cell_user_master_" + user.UserID.toString() +
-            "' class='kbUser'>" + user.Name + "</td>");
-        trIndicator.append("<td id='cell_user_master_" + user.UserID.toString() +
+        tr.append("<td id='cell_user_master_" + user._id.toString() +
+            "' class='kbUser'>" + user.name + "</td>");
+        trIndicator.append("<td id='cell_user_master_" + user._id.toString() +
             "' class='kbUser'  ></td>");
 
         for (j = 0; j < kbSelf.projectStatuses.length; j++) {
             //console.log(kbSelf);
             projStatus = kbSelf.projectStatuses[j];
-            td = $("<td id='cell_user_" + user.UserID.toString() +
-                "_status_" + projStatus.ProjectStatusID.toString() +
+            td = $("<td id='cell_user_" + user._id.toString() +
+                "_status_" + projStatus._id.toString() +
                 "' ></td>")
 
             td.attr("row", ((i*2) +1).toString());
             td.attr("col", (j+1).toString());
 
-                
             colorClass = colors.nextColor('bg');
             td[0].colorClass = colorClass;
-            tdIndicator = $("<td id='cell_indicator_user_" + user.UserID.toString() +
-                "_status_" + projStatus.ProjectStatusID.toString() +
+            tdIndicator = $("<td id='cell_indicator_user_" + user._id.toString() +
+                "_status_" + projStatus._id.toString() +
                 "' class='" + colorClass + "-vlight kbTaskIndicator'></td>")
             container = new TaskContainer(user, projStatus, td[0]);
             tr.append(td);
@@ -383,15 +377,17 @@ KanbanBoard.prototype.loadUITemplates= function (callback, args) {
     $.ajax(
     {
         type: "GET",
-        url: "/api/helper/templates/",
+        url: "/api/templates/task_entry",
         contentType: "application/json; c-harset=utf-8",
         dataType: "json",
         success: function (data) {
             kbSelf.templates ={};
-            $.each(data, function (index, value) {
-                kbSelf.templates[value.Name] = value.Html;
-            });
-
+            kbSelf.templates.task_entry = data.content;
+            /*
+             $.each(data, function (index, value) {
+             kbSelf.templates[value.Name] = value.Html;
+             });
+             */
             if (callback != undefined && callback != null) {
                 callback.onExecutionComplete(callback);
             }
@@ -406,9 +402,12 @@ KanbanBoard.prototype.loadProjectItems = function (callback, args) {
     kbSelf = this.state;
 
     $.each(kbSelf.projectTasks, function (index, item) {
-        divHostId = "#div_user_" + item.UserID.toString() + "_status_" + item.StatusID.toString();
-        taskContainer = $(divHostId)[0].taskContainer;
-        taskContainer.createTask(item);
+        divHostId = "#div_user_" + item.user.toString() + "_status_" + item.status.toString();
+        //console.log([divHostId, $(divHostId),$(divHostId)[0], item]);
+        var div = $(divHostId)[0];
+        if (div != null) {
+            div.taskContainer.createTask(item);
+        }
     });
 }
 
@@ -417,7 +416,7 @@ KanbanBoard.prototype.getProjectItems = function (callback, args) {
     $.ajax(
     {
         type: "GET",
-        url: "/api/board/get/" + $projectID,
+        url: "/api/task/project/" + $projectID,
         contentType: "application/json; charset=utf-8",
         dataType: "json",
         success: function (data) {
@@ -439,7 +438,7 @@ KanbanBoard.prototype.getProjectStatuses = function (callback, args) {
     $.ajax(
     {
         type: "GET",
-        url: "/api/project/statuses/" + $projectID,
+        url: "/api/project/" + $projectID + "/status",
         contentType: "application/json; charset=utf-8",
         dataType: "json",
         success: function (data) {
@@ -456,12 +455,12 @@ KanbanBoard.prototype.getProjectStatuses = function (callback, args) {
 
 KanbanBoard.prototype.newTask = function (userID, statusID) {
     task = {
-        'TaskID': 99999,
-        'UserID': userID,
-        'StatusID': statusID,
-        'Title': '(New Task)',
-        'Descriptions': '',
-        'ProjectID': parseInt($projectID), // todo
+        '_id': 99999,
+        'user': userID,
+        'status': statusID,
+        'title': '(New Task)',
+        'description': '',
+        'project': $projectID,
         'TFSTaskID': 0
     };
     kbSelf.showTask(task);
@@ -472,12 +471,12 @@ KanbanBoard.prototype.showTask = function (task) {
 
     if (task == null) {
         task = {
-            'TaskID': 99999,
-            'UserID': null,
-            'StatusID': null,
-            'Title': '(New Task)',
-            'Descriptions': '',
-            'ProjectID': parseInt($projectID), // todo
+            '_id': 99999,
+            'user': null,
+            'status': null,
+            'title': '(New Task)',
+            'description': '',
+            'project': $projectID, // todo
             'TFSTaskID': 0
         };
     }
@@ -485,20 +484,20 @@ KanbanBoard.prototype.showTask = function (task) {
     saveFunc = null;
     taskitem = null;
     try{
-        taskitem = $("#divTask" + task.TaskID.toString())[0].task
+        taskitem = $("#divTask" + task._id.toString())[0].task
     } catch (e) { }
     
     saveFunc = function (updatedObject) {
+        console.log("Saving ... 1");
         if (taskitem != null) {
-            taskitem = $("#divTask" + task.TaskID.toString())[0].task
+            taskitem = $("#divTask" + task._id.toString())[0].task;
             taskitem.save(function () {
                 taskitem.recreate();
                 kbSelf.keyboard.showFocus();
             });
-        } 
+        }
         else {
-            // Where to insert the new task 
-            
+            // Where to insert the new task
             boardItem = kbSelf.boardItemFromTask(updatedObject);
             taskContainer = kbSelf.keyboard.getCurrentTaskContainer();
             taskitem = taskContainer.createTask(boarditem);
@@ -511,11 +510,11 @@ KanbanBoard.prototype.showTask = function (task) {
 
     kbSelf.keyboard.mode = FocusHelper.MODE_TASK_EDIT;
 
-    listData = { 'UserID': [], 'StatusID': [] }
+    listData = { 'user': [], 'status': [] }
     $.each($kb.projectUsers, function (index, user) {
-        listData.UserID.push({
-            text: user.Name,
-            value: user.UserID.toString(),
+        listData.user.push({
+            text: user.name,
+            value: user._id.toString(),
             selected: false,
             description: user.Email,
             imageSrc: null
@@ -523,9 +522,9 @@ KanbanBoard.prototype.showTask = function (task) {
     });
 
     $.each($kb.projectStatuses, function (index, stat) {
-        listData.StatusID.push({
-            text: stat.Name,
-            value: stat.ProjectStatusID.toString(),
+        listData.status.push({
+            text: stat.name,
+            value: stat._id.toString(),
             selected: false,
             description: "",
             imageSrc: null
@@ -540,18 +539,16 @@ KanbanBoard.prototype.showTask = function (task) {
 KanbanBoard.prototype.boardItemFromTask = function (task, userid, statusid) {
     
     boarditem = {
-        'TaskID': task.TaskID,
-        'UserID': task.UserID,
-        'StatusID': task.StatusID,
-        'Title': task.Title,
-        'Descriptions': task.Descriptions,
-        'ProjectID': task.ProjectID,
+        '_id': task._id,
+        'user': task.user,
+        'status': task.status,
+        'title': task.title,
+        'description': task.description,
+        'project': task.project,
         'TFSTaskID': task.TFSTaskID
     };
     
     return boarditem;
-
-
 }
 
 KanbanBoard.prototype.objectToScreen = function (screenId, object) {
@@ -644,15 +641,20 @@ KanbanBoard.prototype.showScreen = function (templateName, selectLists, updateOb
 
     funcExecute = function (e) {
         try {
+            //_("updatedObj = kbSelf.screenToObject(newID);")
             updatedObj = kbSelf.screenToObject(newID);
+            _(["before update", updateObject]);
             updateObject(updatedObj);
+            _("after update");
             kbSelf.destroyScreen(newID);
             blockUI.remove();
             document.clearAction();
             // TODO
             kbSelf.keyboard.mode = FocusHelper.MODE_TASK_BROWSE;
             kbSelf.keyboard.showFocus();
-        } catch (e) { _(e)}
+        } catch (e) {
+            _("err: " + e.message)
+        }
     }
 
     funcCancel = function (e) {
@@ -682,7 +684,7 @@ KanbanBoard.prototype.getProjectUsers = function (callback, args) {
     $.ajax(
     {
         type: "GET",
-        url: "/api/project/users/" + $projectID,
+        url: "/api/project/" + $projectID + "/user/",
         contentType: "application/json; charset=utf-8",
         dataType: "json",
         success: function (data) {
@@ -695,6 +697,33 @@ KanbanBoard.prototype.getProjectUsers = function (callback, args) {
             alert("Could not load Project Status  from database.");
         }
     });
+}
+
+KanbanBoard.prototype.visitOnTfs = function (taskId) {
+    var wi_id = $("#" + taskId).val();
+    window.open("https://cmra.wkglobal.com:8088/tfs/FS-RC/HMDAWiz-Agile/_workItems#id=" + wi_id + "&triage=true&_a=edit");
+}
+
+KanbanBoard.prototype.updateTfsTitle = function (taskId, titleId) {
+
+    ///tfs/project/:project_id/workitem/:workitem_id
+    var wi_id = $("#" + taskId).val();
+    if (wi_id != null && wi_id != 0) {
+        console.log([taskId, wi_id]);
+        $.ajax(
+            {
+                type: "GET",
+                url: "/api/tfs/project/" + $projectID + "/workitem/" + wi_id,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    $("#" + titleId).val(wi_id + " - " + data.__wrappedArray[0].fields[1]);
+                },
+                error: function (request, status, error) {
+                    alert("Could not load work item title from database.");
+                }
+            });
+    }
 }
 
 function ColorWheel() {
@@ -751,8 +780,8 @@ function TaskContainer(user, status, parentElement) {
 
     tcSelf.user = user;
     tcSelf.status = status;
-    tcSelf.ui = $("<div id='div_user_" + user.UserID.toString() +
-                "_status_" + status.ProjectStatusID.toString() + "' class='" + cssClass + "' ></div>")[0];
+    tcSelf.ui = $("<div id='div_user_" + user._id.toString() +
+        "_status_" + status._id.toString() + "' class='" + cssClass + "' ></div>")[0];
     tcSelf.ui.taskContainer = tcSelf;
     tcSelf.colorClass = parentElement.colorClass;
     $(parentElement).append(tcSelf.ui);
@@ -762,7 +791,6 @@ function TaskContainer(user, status, parentElement) {
     TaskContainer.prototype.createTask = function (boardItem) {
         tcSelf = this;
         ti = new TaskItem(boardItem);
-        
         ti.createUI(tcSelf);
         tcSelf.tasks[ti.ui.id] = ti;
         return ti;
@@ -781,14 +809,14 @@ function TaskItem(boardItem) {
     TaskItem.prototype.createUI = function (taskContainer) {
         tiSelf = this;
         tiSelf.parent = taskContainer;
-        htmlTaskId = tiSelf.item.TaskID.toString(); // "_user_" + tiSelf.item.UserID.toString() + "_status_" + tiSelf.item.StatusID.toString();
+        htmlTaskId = tiSelf.item._id.toString(); // "_user_" + tiSelf.item.UserID.toString() + "_status_" + tiSelf.item.StatusID.toString();
         tiSelf.ui = $("<div id='divTask" + htmlTaskId + "' class='kbTask'></div>")[0];
         $(taskContainer.ui).append(tiSelf.ui);
         //console.log(taskContainer.ui);
         tiSelf.ui.task = tiSelf;
         tiSelfUI = $(tiSelf.ui);
         tiSelfUI.addClass(tiSelf.parent.colorClass + "-vlight");
-        span = $("<span id='taskLabel" + htmlTaskId + "'>" + tiSelf.item.Title + "</span>");
+        span = $("<span id='taskLabel" + htmlTaskId + "'>" + tiSelf.item.title + "</span>");
 
         tiSelfUI.append(span);
 
@@ -817,14 +845,14 @@ function TaskItem(boardItem) {
 
     TaskItem.prototype.refresh = function(){
         tiSelf = this;
-        htmlTaskId = tiSelf.item.TaskID.toString();        
-        span = $("span#taskLabel" + htmlTaskId).text(tiSelf.item.Title);
+        htmlTaskId = tiSelf.item._id.toString();
+        span = $("span#taskLabel" + htmlTaskId).text(tiSelf.item.title);
     }
 
     TaskItem.prototype.recreate = function () {
         tiSelf.parent.tasks[tiSelf.ui.id] = null;
         $(tiSelf.ui).remove();
-        divHostId = "#div_user_" + tiSelf.item.UserID.toString() + "_status_" + tiSelf.item.StatusID.toString();
+        divHostId = "#div_user_" + tiSelf.item.user.toString() + "_status_" + tiSelf.item.status.toString();
         taskContainer = $(divHostId)[0].taskContainer;
         tiSelf.createUI(taskContainer);
         taskContainer.tasks[ti.ui.id] = ti;
@@ -832,31 +860,32 @@ function TaskItem(boardItem) {
 
     TaskItem.prototype.save = function (afterSave) {
         tiSelf = this;
-
         task = {
-            'TaskID': tiSelf.item.TaskID,
-            'UserID': tiSelf.item.UserID,
-            'StatusID': tiSelf.item.StatusID,
-            'Title': tiSelf.item.Title,
-            'Descriptions': tiSelf.item.Descriptions,
-            'ProjectID': parseInt($projectID), // todo
+            '_id': tiSelf.item._id,
+            'user': tiSelf.item.user,
+            'status': tiSelf.item.status,
+            'title': tiSelf.item.title,
+            'description': tiSelf.item.description,
+            'project': $projectID, // todo
             'TFSTaskID': 0
         };
 
         $.ajax(
         {
             type: "POST",
-            url: "/api/board/updatetask",
+            url: "/api/task/update",
             contentType: "application/json; charset=utf-8",
             dataType: "json",
             data: JSON.stringify(task),
             success: function (data) {
-                tiSelf.item.TaskID = data.TaskID;
+                console.log("Save successful");
+                tiSelf.item._id = data.id;
                 if (afterSave) {
                     afterSave();
                 }
             },  
             error: function (request, status, error) {
+                //console.log(error);
                 alert("Could not save task status.");
             }
         });
@@ -870,8 +899,8 @@ function TaskItem(boardItem) {
         oldParent.tasks[tiSelf.ui.id] = null;
         tiSelf.createUI(newParent);
 
-        tiSelf.item.UserID = tiSelf.parent.user.UserID;
-        tiSelf.item.StatusID = tiSelf.parent.status.ProjectStatusID;
+        tiSelf.item.user = tiSelf.parent.user._id;
+        tiSelf.item.status = tiSelf.parent.status._id;
         tiSelf.save();
     }
 }
