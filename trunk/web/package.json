@@ -10,16 +10,52 @@
     "cookie-parser": "*",
     "debug": "*",
     "express": "*",
-    "grunt":"*",
-    "grunt-contrib-less":"*",
+    "grunt": "*",
+    "grunt-contrib-less": "*",
+    "grunt-mongoimport": "*",
+    "grunt-nodemon": "*",
     "less-middleware": "*",
-    "mongodb":"*",
-    "monk":"*",
+    "mongodb": "*",
+    "monk": "*",
     "morgan": "*",
-    "passport":"*",
-    "passport-local":"*",
+    "passport": "*",
+    "passport-local": "*",
     "serve-favicon": "*",
     "swig": "*",
-    "utils-merge":""
-  }
+    "utils-merge": ""
+  },
+  "main": "GruntFile.js",
+  "devDependencies": {
+      "body-parser": "*",
+      "cookie-parser": "*",
+      "debug": "*",
+      "express": "*",
+      "grunt": "*",
+      "grunt-contrib-less": "*",
+      "grunt-mongoimport": "*",
+      "less-middleware": "*",
+      "mongodb": "*",
+      "monk": "*",
+      "morgan": "*",
+      "passport": "*",
+      "passport-local": "*",
+      "serve-favicon": "*",
+      "swig": "*",
+      "utils-merge": ""
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/raasiel/KanbanBoard"
+  },
+  "keywords": [
+    "kanban",
+    "tfs",
+    "node"
+  ],
+  "author": "Shafqat Ahmed",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/raasiel/KanbanBoard/issues"
+  },
+  "homepage": "https://github.com/raasiel/KanbanBoard"
 }
