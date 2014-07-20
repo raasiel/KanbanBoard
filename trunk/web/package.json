@@ -20,6 +20,6 @@
     "passport-local":"*",
     "serve-favicon": "*",
     "swig": "*",
-    "utils-merge":""
+    "utils-merge":"",
   }
 }
