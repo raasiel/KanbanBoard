@@ -2,7 +2,7 @@
 
 
 
-var config = require("./config.devel.js")
-exports = config;
+var config = require("./config.devel.js");
+//exports = config;
 
-module.exports = exports;
+module.exports = config;

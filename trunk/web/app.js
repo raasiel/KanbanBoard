@@ -8,7 +8,7 @@ var express = require('express');
 swig = require('swig');
 
 var path = require('path');
-var favicon = require('static-favicon');
+var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
@@ -32,7 +32,7 @@ app.set('view cache', false);
 swig.setDefaults({ cache: false });
 
 
-app.use(favicon());
+app.use(favicon(__dirname + '/public/favicon.ico'));
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
@@ -89,6 +89,7 @@ passport.deserializeUser(function (user, done) {
 passport.use(new LocalStrategy(
     function (username, password, done) {
         return done(null, {username: username});
+        /*
         User.findOne({ username: username }, function (err, user) {
             if (err) {
                 return done(err);
@@ -101,6 +102,7 @@ passport.use(new LocalStrategy(
             }
             return done(null, {username: username});
         });
+        */
     }
 ));
 
