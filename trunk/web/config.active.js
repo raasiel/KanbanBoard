@@ -1,8 +1,12 @@
 'use strict'
 
+var config = null;
 
-
-var config = require("./config.devel.js");
-//exports = config;
+if (process.env.NODE_ENV === 'production') {
+    config = require("./config.prod.js");
+}
+else {
+    config = require("./config.devel.js");
+}
 
 module.exports = config;

@@ -7,5 +7,7 @@ module.exports = exports;
 
 exports.name = "development";
 exports.port = 3000;
-exports.connection = "mongodb://127.0.0.1:27017/kanbantfs";
+exports.db = "kanbantfs";
+exports.dbhost = "127.0.0.1:27017";
+exports.getConnUri =  function () {return "mongodb://"+ exports.dbhost + ":" + exports.dbport+ "/" + exports.db;}
 exports.apiprefix = "/api"

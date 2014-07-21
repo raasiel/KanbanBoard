@@ -2,6 +2,8 @@
 
 module.exports = function (grunt){
 
+    var config = require ("./config.active.js");
+
     grunt.loadNpmTasks('grunt-contrib-less');
     grunt.loadNpmTasks('grunt-mongoimport');
     grunt.loadNpmTasks('grunt-nodemon');
@@ -20,7 +22,7 @@ module.exports = function (grunt){
         var child;
 
         var exportConf = {
-            db:"kanbantfs",
+            db:config.db,
             collections : ['user','project','projectstatus','task'],
             user:null,
             pass:null,
@@ -33,11 +35,10 @@ module.exports = function (grunt){
         }
 
         exportConf.collections.forEach (function(entry){
-            var execString = "mongoexport --db " + exportConf.db + " --collection " + entry  +" --out ../db/"+ entry +".json --journal --jsonArray";
+            var execString = "mongoexport --db " + exportConf.db + " --collection " + entry  +" --out ../db/"+ entry +".json --journal";
             exec(execString, puts);
         })
     })
-
 
     grunt.initConfig({
         less: {
@@ -67,9 +68,9 @@ module.exports = function (grunt){
         },
         mongoimport: {
             options: {
-                db : 'kanbantfs',
-                host : 'localhost', //optional
-                port: '27017', //optional
+                db : config.db,
+                host : config.dbhost, //optional
+                port: config.dbport, //optional
                 //username : 'username', //optional
                 //password : 'password',  //optional
                 stopOnError : false,  //optional
@@ -112,8 +113,11 @@ module.exports = function (grunt){
     })
 
     if (process.env.NODE_ENV === 'production') {
+        console.log("production")
         grunt.registerTask('default', ['less', 'nodemon']);
+
     } else {
+        console.log("development")
         grunt.registerTask('default', ['less', 'nodemon']);
     }
 
