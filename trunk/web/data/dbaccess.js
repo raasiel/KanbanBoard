@@ -6,6 +6,6 @@ var mongo = require('mongodb');
 var monk = require('monk');
 var db = monk(config.getConnUri());
 
-exports = db;
-module.exports = exports;
+
+module.exports = db;
 

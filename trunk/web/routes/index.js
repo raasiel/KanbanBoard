@@ -3,7 +3,7 @@ var router = express.Router();
 
 /* GET home page. */
 router.get('/', function(req, res) {
-    res.render('login', { title: 'Express' });
+    res.render('index', { title: 'Express' });
 });
 
 router.get('/board', function(req, res) {
@@ -11,7 +11,6 @@ router.get('/board', function(req, res) {
 });
 
 router.get('/tfs', function (req, res) {
-
 
     res.render('tfs',
         { title: 'Express' }

@@ -1,0 +1,19 @@
+{% include './../common/common.html' %}
+<!DOCTYPE html>
+<html class="bg-black">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block app %} {{ app }} {% endblock %} | {% block title %} Welcome {% endblock %} </title>
+    {% include "head-include.html" %}
+</head>
+<body class="bg-black">
+
+{% block content %}{% endblock %}
+
+<!-- jQuery 2.0.2 -->
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
+<!-- Bootstrap -->
+<script src="../../js/bootstrap.min.js" type="text/javascript"></script>
+
+</body>
+</html>
