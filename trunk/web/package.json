@@ -6,6 +6,26 @@
     "start": "node ./bin/www"
   },
   "dependencies": {
+    "body-parser": ">= 1.4.3",
+    "cookie-parser": ">= 1.3.2",
+    "debug": ">= 1.0.4",
+    "express": ">= 4.6.1",
+    "grunt": ">= 0.4.5",
+    "grunt-contrib-less": ">= 0.11.3",
+    "grunt-mongoimport": ">= 0.1.5",
+    "grunt-nodemon": ">= 0.3.0",
+    "less-middleware": ">= 1.0.3",
+    "mongodb": ">= 1.4.7",
+    "monk": ">= 0.9.0",
+    "morgan": ">= 1.4.7",
+    "passport": ">= 0.2.0",
+    "passport-local": ">= 1.0.0",
+    "serve-favicon": ">= 2.0.1",
+    "swig": ">= 1.4.1",
+    "utils-merge": ">= 1.0.0"
+  },
+  "main": "GruntFile.js",
+  "devDependencies": {
     "body-parser": "*",
     "cookie-parser": "*",
     "debug": "*",
@@ -13,7 +33,6 @@
     "grunt": "*",
     "grunt-contrib-less": "*",
     "grunt-mongoimport": "*",
-    "grunt-nodemon": "*",
     "less-middleware": "*",
     "mongodb": "*",
     "monk": "*",
@@ -22,26 +41,8 @@
     "passport-local": "*",
     "serve-favicon": "*",
     "swig": "*",
-    "utils-merge": ""
-  },
-  "main": "GruntFile.js",
-  "devDependencies": {
-      "body-parser": "*",
-      "cookie-parser": "*",
-      "debug": "*",
-      "express": "*",
-      "grunt": "*",
-      "grunt-contrib-less": "*",
-      "grunt-mongoimport": "*",
-      "less-middleware": "*",
-      "mongodb": "*",
-      "monk": "*",
-      "morgan": "*",
-      "passport": "*",
-      "passport-local": "*",
-      "serve-favicon": "*",
-      "swig": "*",
-      "utils-merge": ""
+    "utils-merge": "",
+    "winston": "^0.8.0"
   },
   "repository": {
     "type": "git",
