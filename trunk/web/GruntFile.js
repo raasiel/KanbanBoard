@@ -79,7 +79,7 @@ module.exports = function (grunt){
                         name : 'user',
                         type : 'json',
                         file : '../db/user.json',
-                        jsonArray : true,  //optional
+                        jsonArray : false,  //optional
                         upsert : true,  //optional
                         drop : true  //optional
                     },
@@ -87,7 +87,7 @@ module.exports = function (grunt){
                         name : 'project',
                         type : 'json',
                         file : '../db/project.json',
-                        jsonArray : true,  //optional
+                        jsonArray : false,  //optional
                         upsert : true,  //optional
                         drop : true  //optional
                     },
@@ -95,7 +95,7 @@ module.exports = function (grunt){
                         name : 'projectstatus',
                         type : 'json',
                         file : '../db/projectstatus.json',
-                        jsonArray : true,  //optional
+                        jsonArray : false,  //optional
                         upsert : true,  //optional
                         drop : true  //optional
                     },
@@ -103,7 +103,7 @@ module.exports = function (grunt){
                         name : 'task',
                         type : 'json',
                         file : '../db/task.json',
-                        jsonArray : true,  //optional
+                        jsonArray : false,  //optional
                         upsert : true,  //optional
                         drop : true  //optional
                     }
